@@ -1,0 +1,15 @@
+services:
+  stingus_jira.jira_request:
+    public: true
+    class: Stingus\JiraBundle\Request\JiraRequest
+    arguments: ['@stingus_jira.oauth_client']
+
+  stingus_jira.oauth:
+    public: true
+    class: Stingus\JiraBundle\Oauth\Oauth
+    arguments: ['@router', '@stingus_jira.jira_request', '@event_dispatcher', '@?stingus_jira.oauth_token_manager']
+
+  stingus_jira.oauth_client:
+    public: false
+    class: Stingus\JiraBundle\Oauth\OauthClient
+    arguments: ['%kernel.project_dir%', '%stingus_jira.cert_path%']

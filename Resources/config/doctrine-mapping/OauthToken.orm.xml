@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Stingus\JiraBundle\Model\OauthToken" table="jira_oauth_tokens">
+
+        <id name="id" type="integer" column="id">
+            <generator strategy="IDENTITY" />
+        </id>
+
+        <field name="consumerKey" column="consumer_key" type="string" length="255" unique="true" />
+
+        <field name="baseUrl" column="base_url" type="string" length="255" />
+
+        <field name="verifier" column="verifier" type="string" length="10" />
+
+        <field name="token" column="token" type="string" length="255" />
+
+        <field name="tokenSecret" column="token_secret" type="string" length="255" />
+
+        <field name="expiresAt" column="expires_at" type="datetime"/>
+
+        <field name="authExpiresAt" column="auth_expires_at" type="datetime"/>
+
+        <field name="sessionHandle" column="session_handle" type="string" length="255"/>
+
+    </entity>
+
+</doctrine-mapping>

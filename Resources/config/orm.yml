@@ -1,0 +1,10 @@
+services:
+  stingus_jira.object_manager:
+    factory: Doctrine\Common\Persistence\ManagerRegistry:getManager
+    class: Doctrine\Common\Persistence\ObjectManager
+    public: false
+    arguments: ['%stingus_jira.model_manager_name%']
+
+  stingus_jira.oauth_token_manager:
+    class: Stingus\JiraBundle\Doctrine\OauthTokenManager
+    arguments: ['@stingus_jira.object_manager', '%stingus_jira.oauth_token_class%']

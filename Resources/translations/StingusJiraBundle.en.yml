@@ -1,0 +1,3 @@
+connect:
+  jira:
+    error: There was an error connecting to your Jira instance

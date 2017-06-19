@@ -1,0 +1,41 @@
+{
+  "name": "stingus/jira-bundle",
+  "type": "symfony-bundle",
+  "description": "Symfony bundle for applications used as Jira consumers, providing Oauth 1.0a integration",
+  "keywords": ["jira","oauth","consumer"],
+  "homepage": "http://tbd",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Arthur Kerpician",
+      "email": "arthur@bluechip.ro"
+    }
+  ],
+  "require": {
+    "php": "^7.0",
+    "ext-openssl": "*",
+    "symfony/framework-bundle": "^3.3",
+    "guzzlehttp/guzzle": "^6.2",
+    "guzzlehttp/oauth-subscriber": "^0"
+  },
+  "require-dev": {
+    "symfony/translation": "^3.3",
+    "symfony/yaml": "^3.3",
+    "doctrine/doctrine-bundle": "^1.6",
+    "doctrine/orm": "^2.5",
+    "phpunit/phpunit": "^6.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Stingus\\JiraBundle\\": ""
+    },
+    "exclude-from-classmap": [
+      "/Tests/"
+    ]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "master"
+    }
+  }
+}
