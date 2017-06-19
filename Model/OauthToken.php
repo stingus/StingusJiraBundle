@@ -186,7 +186,7 @@ class OauthToken implements OauthTokenInterface
      */
     public function setExpiresAt(\DateTime $expiresAt): OauthTokenInterface
     {
-        if ($expiresAt < new \DateTime()) {
+        if ($expiresAt <= new \DateTime()) {
             throw new ModelException('Expire date must be in the future');
         }
 
@@ -208,7 +208,7 @@ class OauthToken implements OauthTokenInterface
      */
     public function setAuthExpiresAt(\DateTime $authExpiresAt): OauthTokenInterface
     {
-        if ($authExpiresAt < new \DateTime()) {
+        if ($authExpiresAt <= new \DateTime()) {
             throw new ModelException('Authorization expire date must be in the future');
         }
 
