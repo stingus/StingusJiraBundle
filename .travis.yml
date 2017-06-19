@@ -1,0 +1,28 @@
+language: php
+
+dist: trusty
+
+php:
+  - 7.0
+  - 7.1
+  - hhvm
+
+sudo: false
+
+cache:
+  directories:
+    - "$HOME/.composer/cache"
+
+before_script:
+  - composer install
+
+script:
+  - ./vendor/bin/phpunit
+
+after_success:
+  - vendor/bin/test-reporter
+
+addons:
+  code_climate:
+    repo_token:
+      secure: mN52T1kpQWr3jh28iaF+514cJGaw9foIOihOdVWlscuKDvWnqvXuAFG0de5H1s/KpImkdARtOORF8FP2jHw/QrvWHyqWH45ILyDWvP50lBIeE42ufWuR1uCzSs1i4cbEczaGTj/1xU5WvXrQASsYbBoMrsPs8POVL9b73RBezgRjhQHL3r3kr847zsDMWaFXiX2a93BKh/of3Oj9hCnznZPRAxZy0fizLlzqT0A41F9/XW3yECOmtOQTcrx19BsaLVGKhyNWLo7wOcZYyL1usVJ0u90ApNSY36kwpcC+kNnLmZTaBeKqSQ56sptgDcvTyn/HYIgstAcq23/zOP7a7FLsJuTdNJSEpHiTaDdoyouA92hSt/q0u2TTvyc4MzJol7I7uCkJex9ZVcru3oe6tHv8TXmsG0ZaUTUp5l68hyDIbV10csZr4n7t8NuvaYQcBzukELh0sxGY9+TZm9tPoQ0OLu3wn64HNCe5MgHEWvwo+vxTXyb0IYTKH6pthLX4fDr5FwC8q4phTFK2+YbFIcVeP0/G42QIne1woUWk1QlfGrPFHAWCjt1/jpJlK8f1tW60uOhE/w51FGgxo/CJ0igd0OUjcmI11zxeoTGzW3UkpPhhmvd/pvLmyxOFpafPiuuCX5GQjB4Ww3GKXG5iHyMooqqUVawRQrIcYjoS5+g=
