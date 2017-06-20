@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="./Tests/bootstrap.php" colors="true">
+<phpunit
+        bootstrap="./Tests/bootstrap.php"
+        colors="true"
+        stopOnFailure="false"
+        processIsolation="false"
+        backupGlobals="false"
+        syntaxCheck="true"
+>
 
     <testsuites>
         <testsuite name="StingusJiraBundle test suite">
@@ -18,4 +25,9 @@
             </exclude>
         </whitelist>
     </filter>
+
+    <logging>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
+
 </phpunit>
