@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/stingus/StingusJiraBundle.svg?branch=master)](https://travis-ci.org/stingus/StingusJiraBundle)
+[![Code Climate](https://codeclimate.com/github/stingus/StingusJiraBundle/badges/gpa.svg)](https://codeclimate.com/github/stingus/StingusJiraBundle)
+[![Test Coverage](https://codeclimate.com/github/stingus/StingusJiraBundle/badges/coverage.svg)](https://codeclimate.com/github/stingus/StingusJiraBundle/coverage)
+
 # StingusJiraBundle
 This bundle connects your Symfony application to one or more Atlassian JIRA instances, allowing you to make API requests
 to those instances.
