@@ -50,7 +50,7 @@ class OauthClient
             'consumer_key'           => $oauthToken->getConsumerKey(),
             'token'                  => $oauthToken->getToken(),
             'token_secret'           => $oauthToken->getTokenSecret(),
-            'private_key_file'       => $this->projectRoot.DIRECTORY_SEPARATOR.$this->certPath.DIRECTORY_SEPARATOR.'private.key',
+            'private_key_file'       => $this->projectRoot.DIRECTORY_SEPARATOR.$this->certPath.DIRECTORY_SEPARATOR.Oauth::FILENAME_PRIVATE,
             'private_key_passphrase' => null,
             'signature_method'       => Oauth1::SIGNATURE_METHOD_RSA,
         ]);

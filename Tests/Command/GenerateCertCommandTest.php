@@ -8,6 +8,7 @@ use Stingus\JiraBundle\Command\GenerateCertCommand;
 use PHPUnit\Framework\TestCase;
 use Stingus\JiraBundle\Exception\QuestionException;
 use Stingus\JiraBundle\Exception\RuntimeException;
+use Stingus\JiraBundle\Oauth\Oauth;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -38,9 +39,9 @@ class GenerateCertCommandTest extends TestCase
         $certsDir = $this->getCertPath();
 
         $this->assertSame(0, $exitCode);
-        $this->assertFileExists($certsDir.DIRECTORY_SEPARATOR.'private.key');
-        $this->assertFileExists($certsDir.DIRECTORY_SEPARATOR.'public.key');
-        $this->assertFileExists($certsDir.DIRECTORY_SEPARATOR.'cert.pem');
+        $this->assertFileExists($certsDir.DIRECTORY_SEPARATOR.Oauth::FILENAME_PRIVATE);
+        $this->assertFileExists($certsDir.DIRECTORY_SEPARATOR.Oauth::FILENAME_PUBLIC);
+        $this->assertFileExists($certsDir.DIRECTORY_SEPARATOR.Oauth::FILENAME_CERT);
     }
 
     /**

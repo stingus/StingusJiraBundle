@@ -22,6 +22,10 @@ class Oauth
 {
     const SERVICE_ID = 'stingus_jira.oauth';
 
+    const FILENAME_PRIVATE = 'private.key';
+    const FILENAME_PUBLIC  = 'public.key';
+    const FILENAME_CERT    = 'cert.pem';
+
     const URL_REQUEST_TOKEN   = '/plugins/servlet/oauth/request-token';
     const URL_AUTHORIZE_TOKEN = '/plugins/servlet/oauth/authorize';
     const URL_ACCESS_TOKEN    = '/plugins/servlet/oauth/access-token';

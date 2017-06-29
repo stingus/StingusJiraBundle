@@ -6,6 +6,7 @@ namespace Stingus\JiraBundle\Command;
 
 use Stingus\JiraBundle\Exception\QuestionException;
 use Stingus\JiraBundle\Exception\RuntimeException;
+use Stingus\JiraBundle\Oauth\Oauth;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -130,9 +131,9 @@ class GenerateCertCommand extends ContainerAwareCommand
         $public = openssl_pkey_get_public($cert);
         $publicDetails = openssl_pkey_get_details($public);
 
-        openssl_x509_export_to_file($cert, sprintf('%s/cert.pem', $certPath), false);
-        openssl_pkey_export_to_file($privateKey, sprintf('%s/private.key', $certPath));
-        file_put_contents(sprintf('%s/public.key', $certPath), $publicDetails['key']);
+        openssl_x509_export_to_file($cert, $certPath.DIRECTORY_SEPARATOR.Oauth::FILENAME_CERT, false);
+        openssl_pkey_export_to_file($privateKey, $certPath.DIRECTORY_SEPARATOR.Oauth::FILENAME_PRIVATE);
+        file_put_contents($certPath.DIRECTORY_SEPARATOR.Oauth::FILENAME_PUBLIC, $publicDetails['key']);
 
         $output->writeln(sprintf('<info>All done! Keys saved in %s</info>', $certPath));
     }
