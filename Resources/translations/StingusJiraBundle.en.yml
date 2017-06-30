@@ -1,3 +1,6 @@
-connect:
-  jira:
-    error: There was an error connecting to your Jira instance
+jira:
+  errors:
+    general: 'There was a problem connecting to your Jira instance'
+    model: 'Supplied connection parameters are invalid %parameters%'
+    unauthorized: 'There was an error connecting to your Jira instance. Please check if you configured your Jira instance to accept connections with the consumer key: %consumerKey%'
+    denied: 'You denied the authorization of Scrumvee on your Jira instance'
