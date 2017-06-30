@@ -24,7 +24,19 @@ Step 2: Enable the bundle
         );
     }
 
-Step 3: Update your database schema (optional)
+Step 3: Import the routes
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add the bundle routes in your application:
+
+.. code-block:: yaml
+
+    // app/config/routing.yml
+
+    stingus_jira:
+      resource: "@StingusJiraBundle/Resources/config/routing.yml"
+
+Step 4: Update your database schema (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This step is required only if you intend to use the built-in OAuth token storage feature. If you're using Doctrine ORM

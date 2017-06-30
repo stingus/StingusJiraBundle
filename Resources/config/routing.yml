@@ -1,7 +1,10 @@
 stingus_jira_connect:
-    path:     /_jira/connect/{consumerKey}/{baseUrl}
-    defaults: { _controller: StingusJiraBundle:Oauth:connect }
+  path:     /_jira/connect/{consumerKey}/{baseUrl}
+  defaults: { _controller: StingusJiraBundle:Oauth:connect }
+  requirements:
+    consumerKey: '\w+'
+    baseUrl: '.+'
 
 stingus_jira_callback:
-    path:     /_jira/callback
-    defaults: { _controller: StingusJiraBundle:Oauth:callback }
+  path:     /_jira/callback
+  defaults: { _controller: StingusJiraBundle:Oauth:callback }
