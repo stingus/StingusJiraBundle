@@ -73,6 +73,7 @@ class OauthTokenManager
     {
         $oauthToken = $this->findByConsumerKey($consumerKey);
         if (null !== $oauthToken) {
+            $oauthToken = $this->objectManager->merge($oauthToken);
             $this->objectManager->remove($oauthToken);
             $this->objectManager->flush();
         }

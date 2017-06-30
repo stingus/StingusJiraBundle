@@ -145,6 +145,11 @@ class OauthTokenManagerTest extends TestCase
             ->willReturn($repositoryMock);
         $objectManagerMock
             ->expects($this->exactly(1))
+            ->method('merge')
+            ->with($oauthToken)
+            ->willReturn($oauthToken);
+        $objectManagerMock
+            ->expects($this->exactly(1))
             ->method('remove')
             ->with($oauthToken);
         $objectManagerMock
