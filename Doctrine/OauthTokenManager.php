@@ -65,4 +65,16 @@ class OauthTokenManager
 
         $this->objectManager->flush();
     }
+
+    /**
+     * @param string $consumerKey
+     */
+    public function deleteByConsumerKey(string $consumerKey)
+    {
+        $oauthToken = $this->findByConsumerKey($consumerKey);
+        if (null !== $oauthToken) {
+            $this->objectManager->remove($oauthToken);
+            $this->objectManager->flush();
+        }
+    }
 }

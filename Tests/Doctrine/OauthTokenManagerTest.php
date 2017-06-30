@@ -125,4 +125,59 @@ class OauthTokenManagerTest extends TestCase
         $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
         $oauthTokenManager->save($oauthToken);
     }
+
+    public function testDeleteToken()
+    {
+        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+
+        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repositoryMock
+            ->expects($this->exactly(1))
+            ->method('findOneBy')
+            ->with(['consumerKey' => 'consumer_key'])
+            ->willReturn($oauthToken);
+
+        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $objectManagerMock
+            ->expects($this->exactly(1))
+            ->method('getRepository')
+            ->with(OauthTokenInterface::class)
+            ->willReturn($repositoryMock);
+        $objectManagerMock
+            ->expects($this->exactly(1))
+            ->method('remove')
+            ->with($oauthToken);
+        $objectManagerMock
+            ->expects($this->exactly(1))
+            ->method('flush');
+
+        $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
+        $oauthTokenManager->deleteByConsumerKey('consumer_key');
+    }
+
+    public function testDeleteNonExistingToken()
+    {
+        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
+        $repositoryMock
+            ->expects($this->exactly(1))
+            ->method('findOneBy')
+            ->with(['consumerKey' => 'consumer_key'])
+            ->willReturn(null);
+
+        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $objectManagerMock
+            ->expects($this->exactly(1))
+            ->method('getRepository')
+            ->with(OauthTokenInterface::class)
+            ->willReturn($repositoryMock);
+        $objectManagerMock
+            ->expects($this->never())
+            ->method('remove');
+        $objectManagerMock
+            ->expects($this->never())
+            ->method('flush');
+
+        $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
+        $oauthTokenManager->deleteByConsumerKey('consumer_key');
+    }
 }
