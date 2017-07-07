@@ -36,7 +36,47 @@ Add the bundle routes in your application:
     stingus_jira:
       resource: "@StingusJiraBundle/Resources/config/routing.yml"
 
-Step 4: Update your database schema (optional)
+Step 4: Implement your own OauthTokenInterface class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This class serves as an OAuth token model for all API requests. You must either:
+
+Step 4.1: Extend Stingus\\JiraBundle\\Model\\AbstractOauthToken (recommended)
+-----------------------------------------------------------------------------
+
+This abstract class is a base token model, providing basic methods for handling an OAuth token.
+
+If you plan to use Doctrine ORM, it is recommended to create this class in the ``Entity`` directory:
+
+.. code-block:: php
+
+    <?php
+    // src/AppBundle/Entity/JiraToken.php
+
+    namespace AppBundle\Entity;
+
+    use Stingus\JiraBundle\Model\AbstractOauthToken;
+    use Doctrine\ORM\Mapping as ORM;
+
+    /**
+     * @ORM\Entity()
+     */
+    class JiraToken extends AbstractOauthToken
+    {
+        // Add your entity additional properties and methods
+        ...
+    }
+
+This way, together with ORM mapping configuration below, the bundle will save in your DB the OAuth tokens received from
+JIRA and will retrieve them when needed using the OauthTokenManager.
+
+Step 4.2: Implement your own Stingus\\JiraBundle\\Model\\OauthTokenInterface
+----------------------------------------------------------------------------
+
+If you prefer to build your own token class from scratch, you just need to implement
+``Stingus\JiraBundle\Model\OauthTokenInterface``.
+
+Step 5: Update your database schema (optional)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This step is required only if you intend to use the built-in OAuth token storage feature. If you're using Doctrine ORM
@@ -60,7 +100,7 @@ Here's the full config section:
       mapping:
         driver: orm
         model_manager_name: default
-      oauth_token_class: Stingus\JiraBundle\Model\OauthToken
+      oauth_token_class: AppBundle\Entity\JiraToken
       cert_path: var/certs
       redirect_url: http://example.com/redirect
 
@@ -82,9 +122,7 @@ To disable the token persistence, just remove the ``mapping`` key from the confi
 Other config options
 ~~~~~~~~~~~~~~~~~~~~
 
-``oauth_token_class``: the bundle uses a default OAuth model, implementing
-``Stingus\JiraBundle\Model\OauthTokenInterface``. You can use your own model, but make sure it implements the above
-interface and then set it in the config:
+``oauth_token_class``: this is the FQCN created in step 4.1 or 4.2 above.
 
 .. code-block:: yaml
 

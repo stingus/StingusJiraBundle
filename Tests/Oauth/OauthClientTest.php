@@ -7,16 +7,18 @@ namespace Stingus\JiraBundle\Tests\Oauth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Uri;
 use PHPUnit\Framework\TestCase;
-use Stingus\JiraBundle\Model\OauthToken;
 use Stingus\JiraBundle\Oauth\OauthClient;
+use Stingus\JiraBundle\Tests\Fixtures\OauthToken;
 
 class OauthClientTest extends TestCase
 {
     public function testGetClient()
     {
         $oauthClient = new OauthClient('/project/root', 'cert/path');
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com:80/jira_path?a=1&b=2');
+        $oauthToken = new OauthToken();
         $oauthToken
+            ->setConsumerKey('consumer_key')
+            ->setBaseUrl('https://example.com:80/jira_path?a=1&b=2')
             ->setToken('token')
             ->setTokenSecret('token_secret');
         $client = $oauthClient->getClient($oauthToken);

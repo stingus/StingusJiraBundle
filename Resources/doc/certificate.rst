@@ -32,3 +32,10 @@ If you'd like to use OpenSSL to generate the certificate, you can run the follow
 
 Copy the private.key and the public.key files in your project, at the location set in the ``cert_path`` config.
 **Make sure** the files are named private.key and public.key.
+
+Next steps
+==========
+
+You might want to jump to the `Usage`_ section.
+
+.. _Usage: https://github.com/stingus/StingusJiraBundle/blob/master/Resources/doc/usage.rst

@@ -11,16 +11,16 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
-use Stingus\JiraBundle\Model\OauthToken;
 use Stingus\JiraBundle\Model\OauthTokenInterface;
 use Stingus\JiraBundle\Oauth\OauthClient;
 use Stingus\JiraBundle\Request\JiraRequest;
+use Stingus\JiraBundle\Tests\OauthTokenFactory;
 
 class JiraRequestTest extends TestCase
 {
     public function testPost()
     {
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $container = [];
         $response = $this->getJiraRequest($oauthToken, $container)->post($oauthToken, 'path', ['a' => 1, 'b' => 2]);
@@ -37,7 +37,7 @@ class JiraRequestTest extends TestCase
 
     public function testGet()
     {
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $container = [];
         $response = $this->getJiraRequest($oauthToken, $container)->get($oauthToken, 'path', ['a' => 1, 'b' => 2]);

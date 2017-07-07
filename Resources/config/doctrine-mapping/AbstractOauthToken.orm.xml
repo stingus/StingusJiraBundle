@@ -4,7 +4,7 @@
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                   http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity name="Stingus\JiraBundle\Model\OauthToken" table="jira_oauth_tokens">
+    <mapped-superclass name="Stingus\JiraBundle\Model\AbstractOauthToken">
 
         <id name="id" type="integer" column="id">
             <generator strategy="IDENTITY" />
@@ -26,6 +26,6 @@
 
         <field name="sessionHandle" column="session_handle" type="string" length="255"/>
 
-    </entity>
+    </mapped-superclass>
 
 </doctrine-mapping>

@@ -126,18 +126,6 @@ Configure the listener:
         tags:
            - { name: kernel.event_subscriber }
 
-Using your own OAuthTokenInterface implementation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you want to build your own OAuthToken model, instead of using ``Stingus\JiraBundle\Model\OauthToken``, your model must
-implement ``Stingus\JiraBundle\Model\OauthTokenInterface``. After you create it, make sure you set it in the config:
-
-.. code-block:: yaml
-
-    stingus_jira:
-      ...
-      oauth_token_class: Your\Own\OAuthToken
-
 Making JIRA requests
 --------------------
 

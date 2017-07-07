@@ -2,7 +2,6 @@
 
 namespace Stingus\JiraBundle\DependencyInjection;
 
-use Stingus\JiraBundle\Model\OauthToken;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -37,8 +36,8 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('oauth_token_class')
+                    ->isRequired()
                     ->cannotBeEmpty()
-                    ->defaultValue(OauthToken::class)
                 ->end()
                 ->scalarNode('cert_path')
                     ->defaultValue('var/certs')

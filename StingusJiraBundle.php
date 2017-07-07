@@ -3,7 +3,6 @@
 namespace Stingus\JiraBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Stingus\JiraBundle\Model\OauthToken;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -31,8 +30,7 @@ class StingusJiraBundle extends Bundle
                 DoctrineOrmMappingsPass::createXmlMappingDriver(
                     $mappings,
                     ['stingus_jira.model_manager_name'],
-                    'stingus_jira.backend_type_orm',
-                    ['StingusJiraBundle' => OauthToken::class]
+                    'stingus_jira.backend_type_orm'
                 )
             );
         }

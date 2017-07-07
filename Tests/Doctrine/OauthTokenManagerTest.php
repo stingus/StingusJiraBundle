@@ -8,20 +8,20 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Stingus\JiraBundle\Doctrine\OauthTokenManager;
 use PHPUnit\Framework\TestCase;
-use Stingus\JiraBundle\Model\OauthToken;
 use Stingus\JiraBundle\Model\OauthTokenInterface;
+use Stingus\JiraBundle\Tests\OauthTokenFactory;
 
 class OauthTokenManagerTest extends TestCase
 {
     public function testFindByKeyFound()
     {
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repositoryMock
             ->expects($this->exactly(1))
             ->method('findOneBy')
-            ->with(['consumerKey' => 'consumer_key'])
+            ->with(['consumerKey' => 'consumerKey'])
             ->willReturn($oauthToken);
 
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -33,7 +33,7 @@ class OauthTokenManagerTest extends TestCase
 
         $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
 
-        $this->assertSame($oauthToken, $oauthTokenManager->findByConsumerKey('consumer_key'));
+        $this->assertSame($oauthToken, $oauthTokenManager->findByConsumerKey('consumerKey'));
     }
 
     public function testFindByKeyNotFound()
@@ -42,7 +42,7 @@ class OauthTokenManagerTest extends TestCase
         $repositoryMock
             ->expects($this->exactly(1))
             ->method('findOneBy')
-            ->with(['consumerKey' => 'consumer_key'])
+            ->with(['consumerKey' => 'consumerKey'])
             ->willReturn(null);
 
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -54,18 +54,18 @@ class OauthTokenManagerTest extends TestCase
 
         $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
 
-        $this->assertNull($oauthTokenManager->findByConsumerKey('consumer_key'));
+        $this->assertNull($oauthTokenManager->findByConsumerKey('consumerKey'));
     }
 
     public function testCreateToken()
     {
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repositoryMock
             ->expects($this->exactly(1))
             ->method('findOneBy')
-            ->with(['consumerKey' => 'consumer_key'])
+            ->with(['consumerKey' => 'consumerKey'])
             ->willReturn(null);
 
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -90,16 +90,16 @@ class OauthTokenManagerTest extends TestCase
 
     public function testUpdateToken()
     {
-        $existingToken = new OauthToken('consumer_key', 'https://example.com');
+        $existingToken = OauthTokenFactory::getBasicOauthToken();
         $existingToken->setId(1);
 
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repositoryMock
             ->expects($this->exactly(1))
             ->method('findOneBy')
-            ->with(['consumerKey' => 'consumer_key'])
+            ->with(['consumerKey' => 'consumerKey'])
             ->willReturn($existingToken);
 
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -128,13 +128,13 @@ class OauthTokenManagerTest extends TestCase
 
     public function testDeleteToken()
     {
-        $oauthToken = new OauthToken('consumer_key', 'https://example.com');
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $repositoryMock
             ->expects($this->exactly(1))
             ->method('findOneBy')
-            ->with(['consumerKey' => 'consumer_key'])
+            ->with(['consumerKey' => 'consumerKey'])
             ->willReturn($oauthToken);
 
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -157,7 +157,7 @@ class OauthTokenManagerTest extends TestCase
             ->method('flush');
 
         $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
-        $oauthTokenManager->deleteByConsumerKey('consumer_key');
+        $oauthTokenManager->deleteByConsumerKey('consumerKey');
     }
 
     public function testDeleteNonExistingToken()
@@ -166,7 +166,7 @@ class OauthTokenManagerTest extends TestCase
         $repositoryMock
             ->expects($this->exactly(1))
             ->method('findOneBy')
-            ->with(['consumerKey' => 'consumer_key'])
+            ->with(['consumerKey' => 'consumerKey'])
             ->willReturn(null);
 
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
@@ -183,6 +183,6 @@ class OauthTokenManagerTest extends TestCase
             ->method('flush');
 
         $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
-        $oauthTokenManager->deleteByConsumerKey('consumer_key');
+        $oauthTokenManager->deleteByConsumerKey('consumerKey');
     }
 }

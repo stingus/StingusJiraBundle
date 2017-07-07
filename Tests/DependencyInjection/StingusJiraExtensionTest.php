@@ -6,7 +6,6 @@ namespace Stingus\JiraBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Stingus\JiraBundle\DependencyInjection\StingusJiraExtension;
-use Stingus\JiraBundle\Model\OauthToken;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
@@ -82,13 +81,14 @@ class StingusJiraExtensionTest extends TestCase
 
     public function testMissingOauthTokenClass()
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The child node "oauth_token_class" at path "stingus_jira" must be configured.');
+
         $containerBuilder = new ContainerBuilder();
         $loader = new StingusJiraExtension();
         $config = $this->getFullConfig();
         unset($config['oauth_token_class']);
         $loader->load(array($config), $containerBuilder);
-
-        $this->assertSame(OauthToken::class, $containerBuilder->getParameter('stingus_jira.oauth_token_class'));
     }
 
     public function testMissingCertPath()

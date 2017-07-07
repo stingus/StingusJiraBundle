@@ -9,7 +9,7 @@ use Stingus\JiraBundle\Exception\ModelException;
  *
  * @package Stingus\JiraBundle\Model
  */
-class OauthToken implements OauthTokenInterface
+class AbstractOauthToken implements OauthTokenInterface
 {
     /** @var int */
     private $id;
@@ -37,29 +37,6 @@ class OauthToken implements OauthTokenInterface
 
     /** @var string */
     private $sessionHandle;
-
-    /**
-     * OauthToken constructor.
-     *
-     * @param string $consumerKey
-     * @param string $baseUrl     (eg. https://example.atlassian.net)
-     *
-     * @throws ModelException
-     */
-    public function __construct(string $consumerKey, string $baseUrl)
-    {
-        $keyLength = strlen($consumerKey);
-        if (0 === $keyLength || $keyLength > 255) {
-            throw new ModelException('Consumer key length must be between 0 and 255 characters');
-        }
-
-        if (false === filter_var($baseUrl, FILTER_VALIDATE_URL)) {
-            throw new ModelException('Base URL is invalid');
-        }
-
-        $this->consumerKey = $consumerKey;
-        $this->baseUrl = $baseUrl;
-    }
 
     /**
      * @return int
@@ -102,9 +79,38 @@ class OauthToken implements OauthTokenInterface
     /**
      * {@inheritdoc}
      */
+    public function setConsumerKey(string $consumerKey): AbstractOauthToken
+    {
+        $keyLength = strlen($consumerKey);
+        if (0 === $keyLength || $keyLength > 255) {
+            throw new ModelException('Consumer key length must be between 0 and 255 characters');
+        }
+
+        $this->consumerKey = $consumerKey;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getBaseUrl()
     {
         return $this->baseUrl;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setBaseUrl(string $baseUrl): AbstractOauthToken
+    {
+        if (false === filter_var($baseUrl, FILTER_VALIDATE_URL)) {
+            throw new ModelException('Base URL is invalid');
+        }
+
+        $this->baseUrl = $baseUrl;
+
+        return $this;
     }
 
     /**

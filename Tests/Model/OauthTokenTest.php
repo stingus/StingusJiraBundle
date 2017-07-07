@@ -5,51 +5,71 @@ declare(strict_types = 1);
 namespace Stingus\JiraBundle\Tests\Model;
 
 use Stingus\JiraBundle\Exception\ModelException;
-use Stingus\JiraBundle\Model\OauthToken;
 use PHPUnit\Framework\TestCase;
+use Stingus\JiraBundle\Model\OauthTokenInterface;
+use Stingus\JiraBundle\Tests\Fixtures\OauthToken;
 
 class OauthTokenTest extends TestCase
 {
-    /**
-     * @param string $consumerKey
-     * @param string $baseUrl
-     *
-     * @dataProvider validConstructProvider
-     */
-    public function testCreateSuccessful($consumerKey, $baseUrl)
+    public function testInstantiate()
     {
-        $oauthToken = new OauthToken($consumerKey, $baseUrl);
-
-        $this->assertEquals($consumerKey, $oauthToken->getConsumerKey());
-        $this->assertEquals($baseUrl, $oauthToken->getBaseUrl());
+        $this->assertInstanceOf(OauthTokenInterface::class, new OauthToken());
     }
 
     /**
      * @param mixed $consumerKey
-     * @param mixed $baseUrl
      *
-     * @dataProvider invalidConstructTypeProvider
+     * @dataProvider nonStringTypeProvider
      */
-    public function testCreateWithInvalidTypeKey($consumerKey, $baseUrl)
+    public function testInvalidConsumerKeyType($consumerKey)
     {
         $this->expectException(\TypeError::class);
 
-        new OauthToken($consumerKey, $baseUrl);
+        $oauthToken = new OauthToken();
+        $oauthToken->setConsumerKey($consumerKey);
     }
 
     /**
      * @param string $consumerKey
-     * @param string $baseUrl
      * @param string $exceptionMessage
      *
-     * @dataProvider invalidConstructProvider
+     * @dataProvider invalidConsumerKeyProvider
      */
-    public function testCreateWithInvalidLengthKey($consumerKey, $baseUrl, $exceptionMessage)
+    public function testInvalidConsumerKey($consumerKey, $exceptionMessage)
     {
         $this->expectException(ModelException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
-        new OauthToken($consumerKey, $baseUrl);
+        $oauthToken = new OauthToken();
+        $oauthToken->setConsumerKey($consumerKey);
+    }
+
+    /**
+     * @param mixed $baseUrl
+     *
+     * @dataProvider nonStringTypeProvider
+     */
+    public function testInvalidBaseUrlType($baseUrl)
+    {
+        $this->expectException(\TypeError::class);
+
+        $oauthToken = new OauthToken();
+        $oauthToken->setBaseUrl($baseUrl);
+    }
+
+    /**
+     * @param string $baseUrl
+     * @param string $exceptionMessage
+     *
+     * @dataProvider invalidBaseUrlProvider
+     */
+    public function testInvalidBaseUrl($baseUrl, $exceptionMessage)
+    {
+        $this->expectException(ModelException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+
+        $oauthToken = new OauthToken();
+        $oauthToken->setBaseUrl($baseUrl);
     }
 
     /**
@@ -59,7 +79,7 @@ class OauthTokenTest extends TestCase
      */
     public function testValidId($id)
     {
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setId($id);
 
         $this->assertEquals($id, $oauthToken->getId());
@@ -76,7 +96,7 @@ class OauthTokenTest extends TestCase
         $this->expectException(ModelException::class);
         $this->expectExceptionMessage($exceptionMessage);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setId($id);
     }
 
@@ -87,7 +107,7 @@ class OauthTokenTest extends TestCase
      */
     public function testValidVerifier($verifier)
     {
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setVerifier($verifier);
 
         $this->assertEquals($verifier, $oauthToken->getVerifier());
@@ -102,7 +122,7 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setVerifier($verifier);
     }
 
@@ -111,7 +131,7 @@ class OauthTokenTest extends TestCase
         $this->expectException(ModelException::class);
         $this->expectExceptionMessage('Verifier must not be empty');
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setVerifier('');
     }
 
@@ -122,7 +142,7 @@ class OauthTokenTest extends TestCase
      */
     public function testValidToken($token)
     {
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setToken($token);
 
         $this->assertEquals($token, $oauthToken->getToken());
@@ -137,7 +157,7 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setToken($token);
     }
 
@@ -146,7 +166,7 @@ class OauthTokenTest extends TestCase
         $this->expectException(ModelException::class);
         $this->expectExceptionMessage('Token must not be empty');
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setToken('');
     }
 
@@ -157,7 +177,7 @@ class OauthTokenTest extends TestCase
      */
     public function testValidTokenSecret($tokenSecret)
     {
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setTokenSecret($tokenSecret);
 
         $this->assertEquals($tokenSecret, $oauthToken->getTokenSecret());
@@ -172,7 +192,7 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setTokenSecret($tokenSecret);
     }
 
@@ -181,14 +201,14 @@ class OauthTokenTest extends TestCase
         $this->expectException(ModelException::class);
         $this->expectExceptionMessage('Token secret must not be empty');
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setTokenSecret('');
     }
 
     public function testValidExpiresAt()
     {
         $expiresAt = (new \DateTime())->add(new \DateInterval('PT1S'));
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setExpiresAt($expiresAt);
 
         $this->assertEquals($expiresAt, $oauthToken->getExpiresAt());
@@ -203,7 +223,7 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setExpiresAt($expiresAt);
     }
 
@@ -213,14 +233,14 @@ class OauthTokenTest extends TestCase
         $this->expectExceptionMessage('Expire date must be in the future');
 
         $expiresAt = (new \DateTime())->sub(new \DateInterval('PT0S'));
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setExpiresAt($expiresAt);
     }
 
     public function testValidAuthExpiresAt()
     {
         $authExpiresAt = (new \DateTime())->add(new \DateInterval('PT1S'));
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setAuthExpiresAt($authExpiresAt);
 
         $this->assertEquals($authExpiresAt, $oauthToken->getAuthExpiresAt());
@@ -235,7 +255,7 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setAuthExpiresAt($authExpiresAt);
     }
 
@@ -245,7 +265,7 @@ class OauthTokenTest extends TestCase
         $this->expectExceptionMessage('Authorization expire date must be in the future');
 
         $authExpiresAt = (new \DateTime())->sub(new \DateInterval('PT0S'));
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setAuthExpiresAt($authExpiresAt);
     }
 
@@ -256,7 +276,7 @@ class OauthTokenTest extends TestCase
      */
     public function testValidSessionHandle($sessionHandle)
     {
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setSessionHandle($sessionHandle);
 
         $this->assertEquals($sessionHandle, $oauthToken->getSessionHandle());
@@ -271,7 +291,7 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setSessionHandle($sessionHandle);
     }
 
@@ -280,60 +300,32 @@ class OauthTokenTest extends TestCase
         $this->expectException(ModelException::class);
         $this->expectExceptionMessage('Session handle must not be empty');
 
-        $oauthToken = new OauthToken('consumerKey', 'https://example.com');
+        $oauthToken = new OauthToken();
         $oauthToken->setSessionHandle('');
     }
 
-    public function validConstructProvider()
-    {
-        return [
-            ['consumerKey', 'https://example.com'],
-            ['consumer key', 'https://www.example.com'],
-            ['consumer.key', 'https://example'],
-            ['consumer.12345.key', 'https://example.com'],
-            ['consumer-key', 'http://example.com'],
-            ['consumer_key', 'http://www.example.com'],
-            ['CONSUMERKEY', 'http://example'],
-            ['0', 'https://example.com/dir'],
-            ['-123', 'https://example.com/dir/file.txt'],
-            ['123', 'https://example.com/abc_def'],
-        ];
-    }
-
-    public function invalidConstructTypeProvider()
-    {
-        return [
-            'Integer consumer key' => [0, 'https://example.com'],
-            'Float consumer key' => [0.1, 'https://example.com'],
-            'Object consumer key' => [new \stdClass(), 'https://example.com'],
-            'Array consumer key' => [[], 'https://example.com'],
-            'Integer base URL' => ['consumerKey', 0],
-            'Float base URL' => ['consumerKey', 0.1],
-            'Object base URL' => ['consumerKey', new \stdClass()],
-            'Array base URL' => ['consumerKey', []],
-        ];
-    }
-
-    public function invalidConstructProvider()
+    public function invalidConsumerKeyProvider()
     {
         return [
             'Empty consumer key' => [
                 '',
-                'https://example.com',
                 'Consumer key length must be between 0 and 255 characters',
             ],
             'Consumer key too long' => [
                 str_repeat('a', 256),
-                'https://example.com',
                 'Consumer key length must be between 0 and 255 characters',
             ],
+        ];
+    }
+
+    public function invalidBaseUrlProvider()
+    {
+        return [
             'Invalid base URL 1' => [
-                'consumerKey',
                 'example',
                 'Base URL is invalid',
             ],
             'Invalid base URL 2' => [
-                'consumerKey',
                 'example.com',
                 'Base URL is invalid',
             ],
