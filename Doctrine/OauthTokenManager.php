@@ -50,32 +50,7 @@ class OauthTokenManager
      */
     public function save(OauthTokenInterface $oauthToken)
     {
-        /** @var OauthTokenInterface $existingToken */
-        $existingToken = $this->repository->findOneBy(['consumerKey' => $oauthToken->getConsumerKey()]);
-
-        if (null !== $existingToken) {
-            $oauthToken->setId($existingToken->getId());
-            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-            $oauthToken = $this->objectManager->merge($oauthToken);
-        }
-
-        if (null === $existingToken) {
-            $this->objectManager->persist($oauthToken);
-        }
-
+        $this->objectManager->persist($oauthToken);
         $this->objectManager->flush();
-    }
-
-    /**
-     * @param string $consumerKey
-     */
-    public function deleteByConsumerKey(string $consumerKey)
-    {
-        $oauthToken = $this->findByConsumerKey($consumerKey);
-        if (null !== $oauthToken) {
-            $oauthToken = $this->objectManager->merge($oauthToken);
-            $this->objectManager->remove($oauthToken);
-            $this->objectManager->flush();
-        }
     }
 }

@@ -14,17 +14,17 @@
 
         <field name="baseUrl" column="base_url" type="string" length="255" />
 
-        <field name="verifier" column="verifier" type="string" length="10" />
+        <field name="verifier" column="verifier" type="string" length="10" nullable="true" />
 
-        <field name="token" column="token" type="string" length="255" />
+        <field name="token" column="token" type="string" length="255" nullable="true" />
 
-        <field name="tokenSecret" column="token_secret" type="string" length="255" />
+        <field name="tokenSecret" column="token_secret" type="string" length="255" nullable="true" />
 
-        <field name="expiresAt" column="expires_at" type="datetime"/>
+        <field name="expiresAt" column="expires_at" type="datetime" nullable="true"/>
 
-        <field name="authExpiresAt" column="auth_expires_at" type="datetime"/>
+        <field name="authExpiresAt" column="auth_expires_at" type="datetime" nullable="true" />
 
-        <field name="sessionHandle" column="session_handle" type="string" length="255"/>
+        <field name="sessionHandle" column="session_handle" type="string" length="255" nullable="true" />
 
     </mapped-superclass>
 

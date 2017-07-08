@@ -80,10 +80,18 @@ class OauthController extends Controller
      */
     public function callbackAction(Request $request): RedirectResponse
     {
-        try {
+        $oauthToken = null;
+        if (null !== $tokenManager = $this->get('stingus_jira.oauth_token_manager')) {
+            $oauthToken = $tokenManager->findByConsumerKey($request->query->get('consumer_key'));
+        }
+
+        if (null === $oauthToken) {
             $tokenClass = $this->getParameter('stingus_jira.oauth_token_class');
             /** @var OauthTokenInterface $oauthToken */
             $oauthToken = new $tokenClass();
+        }
+
+        try {
             $oauthToken
                 ->setConsumerKey($request->query->get('consumer_key'))
                 ->setBaseUrl($request->query->get('base_url'))
