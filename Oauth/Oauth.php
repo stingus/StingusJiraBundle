@@ -76,6 +76,7 @@ class Oauth
             ->generate(
                 'stingus_jira_callback',
                 [
+                    'token_id' => $oauthToken->getId(),
                     'consumer_key' => $oauthToken->getConsumerKey(),
                     'base_url' => $oauthToken->getBaseUrl(),
                 ],

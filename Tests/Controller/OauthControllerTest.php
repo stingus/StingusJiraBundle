@@ -4,12 +4,14 @@ declare(strict_types = 1);
 
 namespace Stingus\JiraBundle\Tests\Controller;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Stingus\JiraBundle\Controller\OauthController;
 use PHPUnit\Framework\TestCase;
 use Stingus\JiraBundle\Doctrine\OauthTokenManager;
+use Stingus\JiraBundle\Model\OauthTokenInterface;
 use Stingus\JiraBundle\Oauth\Oauth;
 use Stingus\JiraBundle\Tests\Fixtures\OauthToken;
 use Stingus\JiraBundle\Tests\OauthTokenFactory;
@@ -22,7 +24,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class OauthControllerTest extends TestCase
 {
-    public function testConnectRedirect()
+    /**
+     * @dataProvider connectTokenIdProvider
+     *
+     * @param $tokenId
+     */
+    public function testConnectRedirect($tokenId)
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
@@ -30,6 +37,11 @@ class OauthControllerTest extends TestCase
         $oauthMock
             ->expects($this->exactly(1))
             ->method('getRequestEndpoint')
+            ->with(
+                $this->callback(function (OauthTokenInterface $oauthToken) use ($tokenId) {
+                    return $tokenId === $oauthToken->getId();
+                })
+            )
             ->willReturn('https://jira_request_endpoint');
 
         $container
@@ -46,10 +58,15 @@ class OauthControllerTest extends TestCase
 
         $controller = new OauthController();
         $controller->setContainer($container);
-        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+
+        $request = new Request([
+            'tokenId' => $tokenId,
+            'consumerKey' => 'consumer_key',
+            'baseUrl' => 'https://example.com'
+        ]);
 
         /** @noinspection PhpParamsInspection */
-        $response = $controller->connectAction($requestMock, 'consumer_key', 'https://example.com');
+        $response = $controller->connectAction($request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://jira_request_endpoint', $response->getTargetUrl());
@@ -65,7 +82,10 @@ class OauthControllerTest extends TestCase
         $translatorMock
             ->expects($this->exactly(1))
             ->method('trans')
-            ->with('jira.errors.model', ['%parameters%' => '(consumer key: consumer_key, URL: invalid_url)'], 'StingusJiraBundle')
+            ->with(
+                'jira.errors.model',
+                ['%parameters%' => '(token ID: 1, consumer key: consumer_key, URL: invalid_url)'], 'StingusJiraBundle'
+            )
             ->willReturn('Error message');
 
         $flashBagMock
@@ -101,10 +121,15 @@ class OauthControllerTest extends TestCase
         $controller = new OauthController();
         $controller->setContainer($container);
 
-        $request = new Request([], [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']);
+        $request = new Request([
+            'tokenId' => 1,
+            'consumerKey' => 'consumer_key',
+            'baseUrl' => 'invalid_url'],
+            [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']
+        );
 
         /** @noinspection PhpParamsInspection */
-        $response = $controller->connectAction($request, 'consumer_key', 'invalid_url');
+        $response = $controller->connectAction($request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://example.com/referer', $response->getTargetUrl());
@@ -165,10 +190,15 @@ class OauthControllerTest extends TestCase
         $controller = new OauthController();
         $controller->setContainer($container);
 
-        $request = new Request([], [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']);
+        $request = new Request([
+            'tokenId' => 1,
+            'consumerKey' => 'consumer_key',
+            'baseUrl' => 'https://example.com'],
+            [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']
+        );
 
         /** @noinspection PhpParamsInspection */
-        $response = $controller->connectAction($request, 'consumer_key', 'https://example.com');
+        $response = $controller->connectAction($request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://example.com/referer', $response->getTargetUrl());
@@ -237,10 +267,15 @@ class OauthControllerTest extends TestCase
         $controller = new OauthController();
         $controller->setContainer($container);
 
-        $request = new Request([], [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']);
+        $request = new Request([
+            'tokenId' => 1,
+            'consumerKey' => 'consumer_key',
+            'baseUrl' => 'https://example.com'],
+            [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']
+        );
 
         /** @noinspection PhpParamsInspection */
-        $response = $controller->connectAction($request, 'consumer_key', 'https://example.com');
+        $response = $controller->connectAction($request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://example.com/referer', $response->getTargetUrl());
@@ -250,19 +285,28 @@ class OauthControllerTest extends TestCase
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
+        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
+
+        $oathToken = OauthTokenFactory::getBasicOauthToken();
+        $oathToken
+            ->setToken('oauthToken')
+            ->setVerifier('oauthVerifier');
+
         $tokenManagerMock = $this
             ->getMockBuilder(OauthTokenManager::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $oathToken = OauthTokenFactory::getBasicOauthToken();
-        $oathToken->setToken('oauthToken')->setVerifier('oauthVerifier');
+        $repositoryMock
+            ->expects($this->exactly(1))
+            ->method('find')
+            ->with(1)
+            ->willReturn($oathToken);
 
         $tokenManagerMock
             ->expects($this->exactly(1))
-            ->method('findByConsumerKey')
-            ->with('consumerKey')
-            ->willReturn($oathToken);
+            ->method('getRepository')
+            ->willReturn($repositoryMock);
 
         $container
             ->expects($this->exactly(2))
@@ -280,6 +324,7 @@ class OauthControllerTest extends TestCase
             ->willReturn('https://redirect_url');
 
         $request = new Request([
+            'token_id' => 1,
             'consumer_key' => 'consumerKey',
             'base_url' => 'https://example.com',
             'oauth_token' => 'oauthToken',
@@ -303,6 +348,7 @@ class OauthControllerTest extends TestCase
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
+        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
         $tokenManagerMock = $this
             ->getMockBuilder(OauthTokenManager::class)
             ->disableOriginalConstructor()
@@ -311,11 +357,16 @@ class OauthControllerTest extends TestCase
         $oathToken = OauthTokenFactory::getBasicOauthToken();
         $oathToken->setToken('oauthToken')->setVerifier('oauthVerifier');
 
+        $repositoryMock
+            ->expects($this->exactly(1))
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
+
         $tokenManagerMock
             ->expects($this->exactly(1))
-            ->method('findByConsumerKey')
-            ->with('consumerKey')
-            ->willReturn(null);
+            ->method('getRepository')
+            ->willReturn($repositoryMock);
 
         $container
             ->expects($this->exactly(2))
@@ -336,6 +387,7 @@ class OauthControllerTest extends TestCase
             ->willReturn(OauthToken::class, 'https://redirect_url');
 
         $request = new Request([
+            'token_id' => 1,
             'consumer_key' => 'consumerKey',
             'base_url' => 'https://example.com',
             'oauth_token' => 'oauthToken',
@@ -622,5 +674,81 @@ class OauthControllerTest extends TestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://redirect_url', $response->getTargetUrl());
+    }
+
+    public function testCallbackWithTokenManagerAndMissingTokenId()
+    {
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $tokenManagerMock = $this
+            ->getMockBuilder(OauthTokenManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $translatorMock
+            ->expects($this->exactly(1))
+            ->method('trans')
+            ->with('jira.errors.token_id_missing', [], 'StingusJiraBundle')
+            ->willReturn('Error message');
+
+        $flashBagMock
+            ->expects($this->exactly(1))
+            ->method('add')
+            ->with('error', 'Error message');
+
+        $sessionMock
+            ->expects($this->exactly(1))
+            ->method('getFlashBag')
+            ->willReturn($flashBagMock);
+
+        $container
+            ->expects($this->exactly(3))
+            ->method('get')
+            ->withConsecutive(
+                ['stingus_jira.oauth_token_manager'],
+                ['translator'],
+                ['session']
+            )
+            ->willReturn($tokenManagerMock, $translatorMock, $sessionMock);
+
+        $container
+            ->expects($this->exactly(1))
+            ->method('getParameter')
+            ->withConsecutive(
+                [$this->equalTo('stingus_jira.redirect_url')]
+            )
+            ->willReturn('https://redirect_url');
+
+        $container
+            ->expects($this->exactly(1))
+            ->method('has')
+            ->with('session')
+            ->willReturn(true);
+
+        $request = new Request([
+            'consumer_key' => 'consumerKey',
+            'base_url' => 'https://example.com',
+            'oauth_token' => 'oauthToken',
+            'oauth_verifier' => 'oauthVerifier',
+        ]);
+
+        $controller = new OauthController();
+        $controller->setContainer($container);
+
+        /** @noinspection PhpParamsInspection */
+        $response = $controller->callbackAction($request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertEquals('https://redirect_url', $response->getTargetUrl());
+    }
+
+    public function connectTokenIdProvider()
+    {
+        return [
+            [null],
+            [1]
+        ];
     }
 }

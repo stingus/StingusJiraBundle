@@ -34,15 +34,11 @@ class OauthTokenManager
     }
 
     /**
-     * @param string $consumerKey
-     *
-     * @return null|OauthTokenInterface
+     * @return ObjectRepository
      */
-    public function findByConsumerKey(string $consumerKey)
+    public function getRepository(): ObjectRepository
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-
-        return $this->repository->findOneBy(['consumerKey' => $consumerKey]);
+        return $this->repository;
     }
 
     /**

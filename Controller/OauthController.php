@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class OauthController
@@ -22,13 +23,16 @@ class OauthController extends Controller
      * Connect to Jira endpoint
      *
      * @param Request $request
-     * @param string  $consumerKey
-     * @param string  $baseUrl
      *
      * @return RedirectResponse
      */
-    public function connectAction(Request $request, string $consumerKey, string $baseUrl): RedirectResponse
+    public function connectAction(Request $request): RedirectResponse
     {
+        $tokenId = $request->query->get('tokenId');
+        $consumerKey = $request->query->get('consumerKey');
+        $baseUrl = $request->query->get('baseUrl');
+        $redirectUrl = $request->headers->get('referer');
+
         try {
             $tokenClass = $this->getParameter('stingus_jira.oauth_token_class');
             /** @var OauthTokenInterface $oauthToken */
@@ -36,18 +40,19 @@ class OauthController extends Controller
             $oauthToken
                 ->setConsumerKey($consumerKey)
                 ->setBaseUrl($baseUrl);
+            if (null !== $tokenId) {
+                $oauthToken->setId($tokenId);
+            }
             $redirectUrl = $this->get(Oauth::SERVICE_ID)->getRequestEndpoint($oauthToken);
         } catch (ModelException $exception) {
             $this->addFlash(
                 'error',
                 $this->get('translator')->trans(
                     'jira.errors.model',
-                    ['%parameters%' => sprintf('(consumer key: %s, URL: %s)', $consumerKey, $baseUrl)],
+                    ['%parameters%' => sprintf('(token ID: %s, consumer key: %s, URL: %s)', $tokenId, $consumerKey, $baseUrl)],
                     'StingusJiraBundle'
                 )
             );
-
-            $redirectUrl = $request->headers->get('referer');
         } catch (ClientException $exception) {
             if (Response::HTTP_UNAUTHORIZED === $exception->getCode()) {
                 $this->addFlash(
@@ -64,8 +69,6 @@ class OauthController extends Controller
                     $this->get('translator')->trans('jira.errors.general', [], 'StingusJiraBundle')
                 );
             }
-
-            $redirectUrl = $request->headers->get('referer');
         }
 
         return $this->redirect($redirectUrl);
@@ -80,18 +83,21 @@ class OauthController extends Controller
      */
     public function callbackAction(Request $request): RedirectResponse
     {
-        $oauthToken = null;
-        if (null !== $tokenManager = $this->get('stingus_jira.oauth_token_manager')) {
-            $oauthToken = $tokenManager->findByConsumerKey($request->query->get('consumer_key'));
-        }
-
-        if (null === $oauthToken) {
-            $tokenClass = $this->getParameter('stingus_jira.oauth_token_class');
-            /** @var OauthTokenInterface $oauthToken */
-            $oauthToken = new $tokenClass();
-        }
-
         try {
+            $oauthToken = null;
+            if (null !== $tokenManager = $this->get('stingus_jira.oauth_token_manager')) {
+                if (null === $tokenId = $request->query->get('token_id')) {
+                    throw new BadRequestHttpException('token_id query parameter is missing');
+                }
+                $oauthToken = $tokenManager->getRepository()->find($tokenId);
+            }
+
+            if (null === $oauthToken) {
+                $tokenClass = $this->getParameter('stingus_jira.oauth_token_class');
+                /** @var OauthTokenInterface $oauthToken */
+                $oauthToken = new $tokenClass();
+            }
+
             $oauthToken
                 ->setConsumerKey($request->query->get('consumer_key'))
                 ->setBaseUrl($request->query->get('base_url'))
@@ -119,6 +125,15 @@ class OauthController extends Controller
                     $this->get('translator')->trans('jira.errors.general', [], 'StingusJiraBundle')
                 );
             }
+        } catch (BadRequestHttpException $exception) {
+            $this->addFlash(
+                'error',
+                $this->get('translator')->trans(
+                    'jira.errors.token_id_missing',
+                    [],
+                    'StingusJiraBundle'
+                )
+            );
         }
 
         return $this->redirect($this->getParameter('stingus_jira.redirect_url'));

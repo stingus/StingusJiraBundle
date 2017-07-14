@@ -1,5 +1,5 @@
 stingus_jira_connect:
-  path:     /_jira/connect/{consumerKey}/{baseUrl}
+  path:     /_jira/connect
   defaults: { _controller: StingusJiraBundle:Oauth:connect }
   requirements:
     consumerKey: '\w+'

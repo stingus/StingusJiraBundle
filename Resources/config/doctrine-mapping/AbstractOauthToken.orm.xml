@@ -10,7 +10,7 @@
             <generator strategy="IDENTITY" />
         </id>
 
-        <field name="consumerKey" column="consumer_key" type="string" length="255" unique="true" />
+        <field name="consumerKey" column="consumer_key" type="string" length="255" />
 
         <field name="baseUrl" column="base_url" type="string" length="255" />
 

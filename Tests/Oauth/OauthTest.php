@@ -173,7 +173,11 @@ class OauthTest extends TestCase
             ->method('generate')
             ->with(
                 'stingus_jira_callback',
-                ['consumer_key' => $oauthToken->getConsumerKey(), 'base_url' => $oauthToken->getBaseUrl()],
+                [
+                    'token_id' => null,
+                    'consumer_key' => $oauthToken->getConsumerKey(),
+                    'base_url' => $oauthToken->getBaseUrl()
+                ],
                 UrlGeneratorInterface::ABSOLUTE_URL
             );
 

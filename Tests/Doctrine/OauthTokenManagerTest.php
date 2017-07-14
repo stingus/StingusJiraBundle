@@ -13,18 +13,11 @@ use Stingus\JiraBundle\Tests\OauthTokenFactory;
 
 class OauthTokenManagerTest extends TestCase
 {
-    public function testFindByKeyFound()
+    public function testGetRepository()
     {
-        $oauthToken = OauthTokenFactory::getBasicOauthToken();
-
-        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
-        $repositoryMock
-            ->expects($this->exactly(1))
-            ->method('findOneBy')
-            ->with(['consumerKey' => 'consumerKey'])
-            ->willReturn($oauthToken);
-
         $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
+
         $objectManagerMock
             ->expects($this->exactly(1))
             ->method('getRepository')
@@ -33,28 +26,7 @@ class OauthTokenManagerTest extends TestCase
 
         $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
 
-        $this->assertSame($oauthToken, $oauthTokenManager->findByConsumerKey('consumerKey'));
-    }
-
-    public function testFindByKeyNotFound()
-    {
-        $repositoryMock = $this->getMockBuilder(ObjectRepository::class)->getMock();
-        $repositoryMock
-            ->expects($this->exactly(1))
-            ->method('findOneBy')
-            ->with(['consumerKey' => 'consumerKey'])
-            ->willReturn(null);
-
-        $objectManagerMock = $this->getMockBuilder(ObjectManager::class)->getMock();
-        $objectManagerMock
-            ->expects($this->exactly(1))
-            ->method('getRepository')
-            ->with(OauthTokenInterface::class)
-            ->willReturn($repositoryMock);
-
-        $oauthTokenManager = new OauthTokenManager($objectManagerMock, OauthTokenInterface::class);
-
-        $this->assertNull($oauthTokenManager->findByConsumerKey('consumerKey'));
+        $this->assertSame($repositoryMock, $oauthTokenManager->getRepository());
     }
 
     public function testSaveToken()
