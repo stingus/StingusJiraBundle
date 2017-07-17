@@ -16,6 +16,7 @@ use Stingus\JiraBundle\Oauth\Oauth;
 use Stingus\JiraBundle\Tests\Fixtures\OauthToken;
 use Stingus\JiraBundle\Tests\OauthTokenFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
@@ -45,15 +46,18 @@ class OauthControllerTest extends TestCase
             ->willReturn('https://jira_request_endpoint');
 
         $container
-            ->expects($this->exactly(1))
+            ->expects($this->exactly(2))
             ->method('getParameter')
-            ->with($this->equalTo('stingus_jira.oauth_token_class'))
-            ->willReturn(OauthToken::class);
+            ->withConsecutive(
+                ['stingus_jira.redirect_url'],
+                ['stingus_jira.oauth_token_class']
+            )
+            ->willReturn('https://redirect_url', OauthToken::class);
 
         $container
             ->expects($this->exactly(1))
             ->method('get')
-            ->with($this->equalTo(Oauth::SERVICE_ID))
+            ->with(Oauth::SERVICE_ID)
             ->willReturn($oauthMock);
 
         $controller = new OauthController();
@@ -70,6 +74,84 @@ class OauthControllerTest extends TestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://jira_request_endpoint', $response->getTargetUrl());
+    }
+
+    public function testConnectRedirectNoReferrer()
+    {
+        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
+        $requestMock = $this->getMockBuilder(Request::class)->getMock();
+        $queryMock = $this->getMockBuilder(ParameterBagInterface::class)->getMock();
+        $headersMock = $this->getMockBuilder(ParameterBagInterface::class)->getMock();
+        $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+
+        $flashBagMock
+            ->expects($this->exactly(1))
+            ->method('add')
+            ->with('error', 'Error message');
+
+        $sessionMock
+            ->expects($this->exactly(1))
+            ->method('getFlashBag')
+            ->willReturn($flashBagMock);
+
+        $translatorMock
+            ->expects($this->exactly(1))
+            ->method('trans')
+            ->willReturn('Error message');
+
+        $queryMock
+            ->expects($this->exactly(3))
+            ->method('get')
+            ->withConsecutive(
+                ['tokenId'],
+                ['consumerKey'],
+                ['baseUrl']
+            )
+            ->willReturn(null, '', '');
+
+        $headersMock
+            ->expects($this->exactly(1))
+            ->method('get')
+            ->with('referer')
+            ->willReturn(null);
+
+        $container
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(
+                ['translator'],
+                ['session']
+            )
+            ->willReturn($translatorMock, $sessionMock);
+        $container
+            ->expects($this->exactly(2))
+            ->method('getParameter')
+            ->withConsecutive(
+                ['stingus_jira.redirect_url'],
+                ['stingus_jira.oauth_token_class']
+            )
+            ->willReturn('https://redirect_url', OauthToken::class);
+        $container
+            ->expects($this->exactly(1))
+            ->method('has')
+            ->with('session')
+            ->willReturn(true);
+
+        /** @noinspection PhpUndefinedFieldInspection */
+        $requestMock->query = $queryMock;
+        /** @noinspection PhpUndefinedFieldInspection */
+        $requestMock->headers = $headersMock;
+
+        $controller = new OauthController();
+        $controller->setContainer($container);
+
+        /** @noinspection PhpParamsInspection */
+        $response = $controller->connectAction($requestMock);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertEquals('https://redirect_url', $response->getTargetUrl());
     }
 
     public function testConnectWithModelException()
@@ -101,7 +183,7 @@ class OauthControllerTest extends TestCase
         $container
             ->expects($this->exactly(1))
             ->method('getParameter')
-            ->with($this->equalTo('stingus_jira.oauth_token_class'))
+            ->with('stingus_jira.oauth_token_class')
             ->willReturn(OauthToken::class);
         $container
             ->expects($this->exactly(1))
@@ -168,7 +250,7 @@ class OauthControllerTest extends TestCase
         $container
             ->expects($this->exactly(1))
             ->method('getParameter')
-            ->with($this->equalTo('stingus_jira.oauth_token_class'))
+            ->with('stingus_jira.oauth_token_class')
             ->willReturn(OauthToken::class);
 
         $container
@@ -245,7 +327,7 @@ class OauthControllerTest extends TestCase
         $container
             ->expects($this->exactly(1))
             ->method('getParameter')
-            ->with($this->equalTo('stingus_jira.oauth_token_class'))
+            ->with('stingus_jira.oauth_token_class')
             ->willReturn(OauthToken::class);
 
         $container
@@ -309,18 +391,24 @@ class OauthControllerTest extends TestCase
             ->willReturn($repositoryMock);
 
         $container
+            ->expects($this->exactly(1))
+            ->method('has')
+            ->with('stingus_jira.oauth_token_manager')
+            ->willReturn(true);
+
+        $container
             ->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
-                [$this->equalTo('stingus_jira.oauth_token_manager')],
-                [$this->equalTo(Oauth::SERVICE_ID)]
+                ['stingus_jira.oauth_token_manager'],
+                [Oauth::SERVICE_ID]
             )
             ->willReturn($tokenManagerMock, $oauthMock);
 
         $container
             ->expects($this->exactly(1))
             ->method('getParameter')
-            ->with($this->equalTo('stingus_jira.redirect_url'))
+            ->with('stingus_jira.redirect_url')
             ->willReturn('https://redirect_url');
 
         $request = new Request([
@@ -334,7 +422,7 @@ class OauthControllerTest extends TestCase
         $oauthMock
             ->expects($this->exactly(1))
             ->method('getAccessToken')
-            ->with($this->equalTo($oathToken));
+            ->with($oathToken);
 
         $controller = new OauthController();
         $controller->setContainer($container);
@@ -369,11 +457,17 @@ class OauthControllerTest extends TestCase
             ->willReturn($repositoryMock);
 
         $container
+            ->expects($this->exactly(1))
+            ->method('has')
+            ->with('stingus_jira.oauth_token_manager')
+            ->willReturn(true);
+
+        $container
             ->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
-                [$this->equalTo('stingus_jira.oauth_token_manager')],
-                [$this->equalTo(Oauth::SERVICE_ID)]
+                ['stingus_jira.oauth_token_manager'],
+                [Oauth::SERVICE_ID]
             )
             ->willReturn($tokenManagerMock, $oauthMock);
 
@@ -382,7 +476,7 @@ class OauthControllerTest extends TestCase
             ->method('getParameter')
             ->withConsecutive(
                 ['stingus_jira.oauth_token_class'],
-                [$this->equalTo('stingus_jira.redirect_url')]
+                ['stingus_jira.redirect_url']
             )
             ->willReturn(OauthToken::class, 'https://redirect_url');
 
@@ -397,7 +491,7 @@ class OauthControllerTest extends TestCase
         $oauthMock
             ->expects($this->exactly(1))
             ->method('getAccessToken')
-            ->with($this->equalTo($oathToken));
+            ->with($oathToken);
 
         $controller = new OauthController();
         $controller->setContainer($container);
@@ -416,20 +510,23 @@ class OauthControllerTest extends TestCase
         $oathToken->setToken('oauthToken')->setVerifier('oauthVerifier');
 
         $container
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(1))
+            ->method('has')
+            ->with('stingus_jira.oauth_token_manager')
+            ->willReturn(false);
+
+        $container
+            ->expects($this->exactly(1))
             ->method('get')
-            ->withConsecutive(
-                [$this->equalTo('stingus_jira.oauth_token_manager')],
-                [$this->equalTo(Oauth::SERVICE_ID)]
-            )
-            ->willReturn(null, $oauthMock);
+            ->with(Oauth::SERVICE_ID)
+            ->willReturn($oauthMock);
 
         $container
             ->expects($this->exactly(2))
             ->method('getParameter')
             ->withConsecutive(
                 ['stingus_jira.oauth_token_class'],
-                [$this->equalTo('stingus_jira.redirect_url')]
+                ['stingus_jira.redirect_url']
             )
             ->willReturn(OauthToken::class, 'https://redirect_url');
 
@@ -443,7 +540,7 @@ class OauthControllerTest extends TestCase
         $oauthMock
             ->expects($this->exactly(1))
             ->method('getAccessToken')
-            ->with($this->equalTo($oathToken));
+            ->with($oathToken);
 
         $controller = new OauthController();
         $controller->setContainer($container);
@@ -477,27 +574,29 @@ class OauthControllerTest extends TestCase
             ->willReturn($flashBagMock);
 
         $container
-            ->expects($this->exactly(1))
+            ->expects($this->exactly(2))
             ->method('has')
-            ->with('session')
-            ->willReturn(true);
-
-        $container
-            ->expects($this->exactly(3))
-            ->method('get')
             ->withConsecutive(
                 ['stingus_jira.oauth_token_manager'],
+                ['session']
+            )
+            ->willReturn(false, true);
+
+        $container
+            ->expects($this->exactly(2))
+            ->method('get')
+            ->withConsecutive(
                 ['translator'],
                 ['session']
             )
-            ->willReturn(null, $translatorMock, $sessionMock);
+            ->willReturn($translatorMock, $sessionMock);
 
         $container
             ->expects($this->exactly(2))
             ->method('getParameter')
             ->withConsecutive(
-                [$this->equalTo('stingus_jira.oauth_token_class')],
-                [$this->equalTo('stingus_jira.redirect_url')]
+                ['stingus_jira.oauth_token_class'],
+                ['stingus_jira.redirect_url']
             )
             ->willReturn(OauthToken::class, 'https://redirect_url');
 
@@ -542,28 +641,30 @@ class OauthControllerTest extends TestCase
             ->willReturn($flashBagMock);
 
         $container
-            ->expects($this->exactly(1))
+            ->expects($this->exactly(2))
             ->method('has')
-            ->with('session')
-            ->willReturn(true);
-
-        $container
-            ->expects($this->exactly(4))
-            ->method('get')
             ->withConsecutive(
                 ['stingus_jira.oauth_token_manager'],
+                ['session']
+            )
+            ->willReturn(false, true);
+
+        $container
+            ->expects($this->exactly(3))
+            ->method('get')
+            ->withConsecutive(
                 [Oauth::SERVICE_ID],
                 ['translator'],
                 ['session']
             )
-            ->willReturn(null, $oauthMock, $translatorMock, $sessionMock);
+            ->willReturn($oauthMock, $translatorMock, $sessionMock);
 
         $container
             ->expects($this->exactly(2))
             ->method('getParameter')
             ->withConsecutive(
-                [$this->equalTo('stingus_jira.oauth_token_class')],
-                [$this->equalTo('stingus_jira.redirect_url')]
+                ['stingus_jira.oauth_token_class'],
+                ['stingus_jira.redirect_url']
             )
             ->willReturn(OauthToken::class, 'https://redirect_url');
 
@@ -580,7 +681,7 @@ class OauthControllerTest extends TestCase
         $oauthMock
             ->expects($this->exactly(1))
             ->method('getAccessToken')
-            ->with($this->equalTo($oathToken))
+            ->with($oathToken)
             ->willThrowException(new ClientException('Exception message', $requestMock));
 
         $controller = new OauthController();
@@ -625,28 +726,30 @@ class OauthControllerTest extends TestCase
             ->willReturn($flashBagMock);
 
         $container
-            ->expects($this->exactly(1))
+            ->expects($this->exactly(2))
             ->method('has')
-            ->with('session')
-            ->willReturn(true);
-
-        $container
-            ->expects($this->exactly(4))
-            ->method('get')
             ->withConsecutive(
                 ['stingus_jira.oauth_token_manager'],
+                ['session']
+            )
+            ->willReturn(false, true);
+
+        $container
+            ->expects($this->exactly(3))
+            ->method('get')
+            ->withConsecutive(
                 [Oauth::SERVICE_ID],
                 ['translator'],
                 ['session']
             )
-            ->willReturn(null, $oauthMock, $translatorMock, $sessionMock);
+            ->willReturn($oauthMock, $translatorMock, $sessionMock);
 
         $container
             ->expects($this->exactly(2))
             ->method('getParameter')
             ->withConsecutive(
-                [$this->equalTo('stingus_jira.oauth_token_class')],
-                [$this->equalTo('stingus_jira.redirect_url')]
+                ['stingus_jira.oauth_token_class'],
+                ['stingus_jira.redirect_url']
             )
             ->willReturn(OauthToken::class, 'https://redirect_url');
 
@@ -663,7 +766,7 @@ class OauthControllerTest extends TestCase
         $oauthMock
             ->expects($this->exactly(1))
             ->method('getAccessToken')
-            ->with($this->equalTo($oathToken))
+            ->with($oathToken)
             ->willThrowException(new ClientException('Exception message', $requestMock, $responseMock));
 
         $controller = new OauthController();
@@ -704,6 +807,15 @@ class OauthControllerTest extends TestCase
             ->willReturn($flashBagMock);
 
         $container
+            ->expects($this->exactly(2))
+            ->method('has')
+            ->withConsecutive(
+                ['stingus_jira.oauth_token_manager'],
+                ['session']
+            )
+            ->willReturn(true, true);
+
+        $container
             ->expects($this->exactly(3))
             ->method('get')
             ->withConsecutive(
@@ -717,15 +829,9 @@ class OauthControllerTest extends TestCase
             ->expects($this->exactly(1))
             ->method('getParameter')
             ->withConsecutive(
-                [$this->equalTo('stingus_jira.redirect_url')]
+                ['stingus_jira.redirect_url']
             )
             ->willReturn('https://redirect_url');
-
-        $container
-            ->expects($this->exactly(1))
-            ->method('has')
-            ->with('session')
-            ->willReturn(true);
 
         $request = new Request([
             'consumer_key' => 'consumerKey',

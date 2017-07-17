@@ -31,7 +31,9 @@ class OauthController extends Controller
         $tokenId = $request->query->get('tokenId');
         $consumerKey = $request->query->get('consumerKey');
         $baseUrl = $request->query->get('baseUrl');
-        $redirectUrl = $request->headers->get('referer');
+        if (null === $redirectUrl = $request->headers->get('referer')) {
+            $redirectUrl = $this->getParameter('stingus_jira.redirect_url');
+        }
 
         try {
             $tokenClass = $this->getParameter('stingus_jira.oauth_token_class');
@@ -85,7 +87,8 @@ class OauthController extends Controller
     {
         try {
             $oauthToken = null;
-            if (null !== $tokenManager = $this->get('stingus_jira.oauth_token_manager')) {
+            if ($this->has('stingus_jira.oauth_token_manager')) {
+                $tokenManager = $this->get('stingus_jira.oauth_token_manager');
                 if (null === $tokenId = $request->query->get('token_id')) {
                     throw new BadRequestHttpException('token_id query parameter is missing');
                 }

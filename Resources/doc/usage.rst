@@ -42,18 +42,34 @@ Starting the authorization process
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After configuring your JIRA instance to accept connections from your application, you can start the authorization
-process. In one of your application's controllers issue a redirect to the following route:
+process. In one of your application's controllers issue a forward or a redirect to the following route:
 
 .. code-block:: php
 
     <?php
     // src/AppBundle/Controller/DefaultController.php
 
-    public function startAuthorizationAction()
+    // Using a forward
+    public function forwardAction()
     {
         return $this->forward(
             'StingusJiraBundle:Oauth:connect',
+            [],
             [
+                'tokenId' => 'existing_token_id',
+                'consumerKey' => 'your_consumer_key',
+                'baseUrl' => 'https://example.atlassian.net',
+            ]
+        );
+    }
+
+    // Using a redirect
+    public function redirectAction()
+    {
+        return $this->redirectToRoute(
+            'stingus_jira_connect',
+            [
+                'tokenId' => 'existing_token_id',
                 'consumerKey' => 'your_consumer_key',
                 'baseUrl' => 'https://example.atlassian.net',
             ]
@@ -63,12 +79,23 @@ process. In one of your application's controllers issue a redirect to the follow
 This will forward the request to the first step of the authorization process, using a controller exposed by this bundle.
 You'll need to provide the following route parameters:
 
+``tokenId``: (optional) if you're using the ORM feature and you already have saved a temporary token in the DB, you
+can pass it to the authorization step. This way, your saved token will be updated once the authorization is complete
+
 ``consumerKey``: the consumer key used in JIRA configuration step 6i
 
 ``baseUrl``: the base URL of your JIRA instance (eg. https://example.atlassian.net)
 
 The browser will then be redirected to the application authorization page of JIRA. After the user
 authorizes your application, il will be redirected to the ``redirect_url`` set in your config.yml.
+
+You can also start the authorization from a Twig template:
+
+.. code-block::
+
+    # src/AppBundle/Resources/views/Default/index.html.twig
+
+    <a href="{{ path('stingus_jira_connect', { "tokenId": existing_token_id, "consumerKey": "your_consumer_key", "baseUrl": "https://example.atlassian.net" }) }}">Authorize</a>
 
 Saving the OAuth token for JIRA requests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -139,7 +166,7 @@ After you have persisted the OAuth token, you can now make requests to JIRA API.
     public function getStoryAction($consumerKey, $storyId)
     {
         // Retrieve the OAuth token from storage, using the provided OAuthTokenManager
-        $oauthToken = $this->get(OauthTokenManager::SERVICE_ID)->findByConsumerKey($consumerKey);
+        $oauthToken = $this->get(OauthTokenManager::SERVICE_ID)->getRepository()->find($tokenId);
 
         // Make a JIRA request using the token
         $story = $this->get(JiraRequest::SERVICE_ID)->get($oauthToken, '/rest/api/latest/issue/'.$storyId);
