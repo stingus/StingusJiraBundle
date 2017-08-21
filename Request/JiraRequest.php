@@ -35,14 +35,28 @@ class JiraRequest
      * @param OauthTokenInterface $oauthToken
      * @param string              $url
      * @param array               $query
+     * @param string              $body
      *
      * @return ResponseInterface
      */
-    public function post(OauthTokenInterface $oauthToken, string $url, array $query = []): ResponseInterface
-    {
+    public function post(
+        OauthTokenInterface $oauthToken,
+        string $url,
+        ?array $query = null,
+        ?string $body = null
+    ): ResponseInterface {
         return $this->oauthClient
             ->getClient($oauthToken)
-            ->post($url, ['query' => $query]);
+            ->post(
+                $url,
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                    ],
+                    'query' => $query,
+                    'body' => $body,
+                ]
+            );
     }
 
     /**
@@ -54,10 +68,56 @@ class JiraRequest
      *
      * @return ResponseInterface
      */
-    public function get(OauthTokenInterface $oauthToken, string $url, array $query = []): ResponseInterface
+    public function get(OauthTokenInterface $oauthToken, string $url, ?array $query = null): ResponseInterface
     {
         return $this->oauthClient
             ->getClient($oauthToken)
             ->get($url, ['query' => $query]);
+    }
+
+    /**
+     * Make a PUT request to Jira endpoint
+     *
+     * @param OauthTokenInterface $oauthToken
+     * @param string              $url
+     * @param array               $query
+     * @param string              $body
+     *
+     * @return ResponseInterface
+     */
+    public function put(
+        OauthTokenInterface $oauthToken,
+        string $url,
+        ?array $query = null,
+        ?string $body = null
+    ): ResponseInterface {
+        return $this->oauthClient
+            ->getClient($oauthToken)
+            ->put(
+                $url,
+                [
+                    'headers' => [
+                        'Content-Type' => 'application/json',
+                    ],
+                    'query' => $query,
+                    'body' => $body,
+                ]
+            );
+    }
+
+    /**
+     * Make a DELETE request to Jira endpoint
+     *
+     * @param OauthTokenInterface $oauthToken
+     * @param string              $url
+     * @param array               $query
+     *
+     * @return ResponseInterface
+     */
+    public function delete(OauthTokenInterface $oauthToken, string $url, ?array $query = null): ResponseInterface
+    {
+        return $this->oauthClient
+            ->getClient($oauthToken)
+            ->delete($url, ['query' => $query]);
     }
 }

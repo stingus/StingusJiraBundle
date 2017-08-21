@@ -163,19 +163,60 @@ After you have persisted the OAuth token, you can now make requests to JIRA API.
     <?php
     // src/AppBundle/Controller/DefaultController.php
 
-    public function getStoryAction($consumerKey, $storyId)
+    // POST example
+    public function createIssueAction($consumerKey)
     {
         // Retrieve the OAuth token from storage, using the provided OAuthTokenManager
         $oauthToken = $this->get(OauthTokenManager::SERVICE_ID)->getRepository()->find($tokenId);
 
-        // Make a JIRA request using the token
-        $story = $this->get(JiraRequest::SERVICE_ID)->get($oauthToken, '/rest/api/latest/issue/'.$storyId);
+        $body = '{...JSON encoded, check JIRA documentation below...}';
 
-        return new Response($story->getBody()->getContents());
+        // Make a POST JIRA request to create an issue
+        $response = $this->get(JiraRequest::SERVICE_ID)->post($oauthToken, '/rest/api/latest/issue', null, $body);
+
+        return new Response($response->getBody()->getContents());
     }
 
-The ``Stingus\JiraBundle\Request\JiraRequest`` offers just get() and post() methods for now, it will soon have all the REST
-methods available.
+    // GET example
+    public function getIssueAction($consumerKey, $issueId)
+    {
+        // Retrieve the OAuth token from storage, using the provided OAuthTokenManager
+        $oauthToken = $this->get(OauthTokenManager::SERVICE_ID)->getRepository()->find($tokenId);
+
+        // Make a GET JIRA request to get an issue
+        $response  = $this->get(JiraRequest::SERVICE_ID)->get($oauthToken, '/rest/api/latest/issue/'.$issueId);
+
+        return new Response($response->getBody()->getContents());
+    }
+
+    // PUT example
+    public function setEstimationAction($consumerKey, $issueId, $boardId)
+    {
+        // Retrieve the OAuth token from storage, using the provided OAuthTokenManager
+        $oauthToken = $this->get(OauthTokenManager::SERVICE_ID)->getRepository()->find($tokenId);
+
+        // Make a PUT JIRA request to save the estimation
+        $response = $this->get(JiraRequest::SERVICE_ID)->put(
+            $oauthToken,
+            '/rest/agile/1.0/issue/'.$issueId.'/estimation',
+            ['boardId' => $boardId],
+            json_encode(['value' => 11])
+        );
+
+        return new Response($response->getBody()->getContents());
+    }
+
+    // DELETE example
+    public function deleteIssueAction($consumerKey, $issueId, $boardId)
+    {
+        // Retrieve the OAuth token from storage, using the provided OAuthTokenManager
+        $oauthToken = $this->get(OauthTokenManager::SERVICE_ID)->getRepository()->find($tokenId);
+
+        // Make a DELETE JIRA request to delete an issue
+        $response = $this->get(JiraRequest::SERVICE_ID)->delete($oauthToken, '/rest/api/latest/issue/'.$issueId);
+
+        return new Response($response->getBody()->getContents());
+    }
 
 That's it! Check the `documentation for JIRA API`_ to learn more about the endpoints.
 

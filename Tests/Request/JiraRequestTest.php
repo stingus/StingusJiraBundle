@@ -23,16 +23,21 @@ class JiraRequestTest extends TestCase
         $oauthToken = OauthTokenFactory::getBasicOauthToken();
 
         $container = [];
-        $response = $this->getJiraRequest($oauthToken, $container)->post($oauthToken, 'path', ['a' => 1, 'b' => 2]);
+        $response = $this->getJiraRequest($oauthToken, $container)
+            ->post($oauthToken, 'path', ['a' => 1, 'b' => 2], 'body');
 
         /** @var Request $request */
         $request = $container[0]['request'];
         $uri = $request->getUri();
+        $contentType = $request->getHeader('Content-Type');
 
         $this->assertEquals('response content', $response->getBody()->getContents());
         $this->assertEquals('POST', $request->getMethod());
         $this->assertEquals('path', $uri->getPath());
         $this->assertEquals('a=1&b=2', $uri->getQuery());
+        $this->assertEquals('body', $request->getBody());
+        $this->assertCount(1, $contentType);
+        $this->assertEquals('application/json', $contentType[0]);
     }
 
     public function testGet()
@@ -48,6 +53,45 @@ class JiraRequestTest extends TestCase
 
         $this->assertEquals('response content', $response->getBody()->getContents());
         $this->assertEquals('GET', $request->getMethod());
+        $this->assertEquals('path', $uri->getPath());
+        $this->assertEquals('a=1&b=2', $uri->getQuery());
+    }
+
+    public function testPut()
+    {
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
+
+        $container = [];
+        $response = $this->getJiraRequest($oauthToken, $container)
+            ->put($oauthToken, 'path', ['a' => 1, 'b' => 2], 'body');
+
+        /** @var Request $request */
+        $request = $container[0]['request'];
+        $uri = $request->getUri();
+        $contentType = $request->getHeader('Content-Type');
+
+        $this->assertEquals('response content', $response->getBody()->getContents());
+        $this->assertEquals('PUT', $request->getMethod());
+        $this->assertEquals('path', $uri->getPath());
+        $this->assertEquals('a=1&b=2', $uri->getQuery());
+        $this->assertEquals('body', $request->getBody());
+        $this->assertCount(1, $contentType);
+        $this->assertEquals('application/json', $contentType[0]);
+    }
+
+    public function testDelete()
+    {
+        $oauthToken = OauthTokenFactory::getBasicOauthToken();
+
+        $container = [];
+        $response = $this->getJiraRequest($oauthToken, $container)->delete($oauthToken, 'path', ['a' => 1, 'b' => 2]);
+
+        /** @var Request $request */
+        $request = $container[0]['request'];
+        $uri = $request->getUri();
+
+        $this->assertEquals('response content', $response->getBody()->getContents());
+        $this->assertEquals('DELETE', $request->getMethod());
         $this->assertEquals('path', $uri->getPath());
         $this->assertEquals('a=1&b=2', $uri->getQuery());
     }
