@@ -42,8 +42,8 @@ class JiraRequest
     public function post(
         OauthTokenInterface $oauthToken,
         string $url,
-        ?array $query = null,
-        ?string $body = null
+        array $query = null,
+        string $body = null
     ): ResponseInterface {
         return $this->oauthClient
             ->getClient($oauthToken)
@@ -68,7 +68,7 @@ class JiraRequest
      *
      * @return ResponseInterface
      */
-    public function get(OauthTokenInterface $oauthToken, string $url, ?array $query = null): ResponseInterface
+    public function get(OauthTokenInterface $oauthToken, string $url, array $query = null): ResponseInterface
     {
         return $this->oauthClient
             ->getClient($oauthToken)
@@ -88,8 +88,8 @@ class JiraRequest
     public function put(
         OauthTokenInterface $oauthToken,
         string $url,
-        ?array $query = null,
-        ?string $body = null
+        array $query = null,
+        string $body = null
     ): ResponseInterface {
         return $this->oauthClient
             ->getClient($oauthToken)
@@ -114,7 +114,7 @@ class JiraRequest
      *
      * @return ResponseInterface
      */
-    public function delete(OauthTokenInterface $oauthToken, string $url, ?array $query = null): ResponseInterface
+    public function delete(OauthTokenInterface $oauthToken, string $url, array $query = null): ResponseInterface
     {
         return $this->oauthClient
             ->getClient($oauthToken)

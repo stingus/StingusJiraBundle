@@ -172,7 +172,7 @@ After you have persisted the OAuth token, you can now make requests to JIRA API.
         $body = '{...JSON encoded, check JIRA documentation below...}';
 
         // Make a POST JIRA request to create an issue
-        $response = $this->get(JiraRequest::SERVICE_ID)->post($oauthToken, '/rest/api/latest/issue', null, $body);
+        $response = $this->get(JiraRequest::SERVICE_ID)->post($oauthToken, '/rest/api/latest/issue', [], $body);
 
         return new Response($response->getBody()->getContents());
     }
