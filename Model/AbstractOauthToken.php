@@ -10,31 +10,31 @@ namespace Stingus\JiraBundle\Model;
 class AbstractOauthToken implements OauthTokenInterface
 {
     /** @var int */
-    private $id;
+    protected $id;
 
     /** @var string */
-    private $consumerKey;
+    protected $consumerKey;
 
     /** @var string */
-    private $baseUrl;
+    protected $baseUrl;
 
     /** @var string */
-    private $verifier;
+    protected $verifier;
 
     /** @var string */
-    private $token;
+    protected $token;
 
     /** @var string */
-    private $tokenSecret;
+    protected $tokenSecret;
 
     /** @var \DateTime */
-    private $expiresAt;
+    protected $expiresAt;
 
     /** @var \DateTime */
-    private $authExpiresAt;
+    protected $authExpiresAt;
 
     /** @var string */
-    private $sessionHandle;
+    protected $sessionHandle;
 
     /**
      * @return int

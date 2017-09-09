@@ -1,0 +1,7 @@
+jira_token:
+  consumer_key:
+    not_blank: 'Consumer key cannot be empty'
+    min: 'Consumer key must be at least {{ limit }} characters long'
+    max: 'Consumer key cannot be longer than {{ limit }} characters'
+  base_url:
+    not_blank: 'Base URL cannot be empty'

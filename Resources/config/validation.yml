@@ -1,0 +1,15 @@
+ScrumBundle\Entity\JiraToken:
+  properties:
+    consumerKey:
+      - NotBlank:
+          message: jira_token.consumer_key.not_blank
+      - Length:
+          min: 1
+          max: 255
+          minMessage: jira_token.consumer_key.min
+          maxMessage: jira_token.consumer_key.max
+    baseUrl:
+      - NotBlank:
+          message: jira_token.base_url.not_blank
+      - Url:
+          checkDNS: true
