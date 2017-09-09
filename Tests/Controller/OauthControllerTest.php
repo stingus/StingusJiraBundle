@@ -85,6 +85,18 @@ class OauthControllerTest extends TestCase
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
         $sessionMock = $this->getMockBuilder(Session::class)->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
+        $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
+
+        $clientException = new ClientException(
+            'Exception message',
+            $this->getMockBuilder(RequestInterface::class)->getMock()
+        );
+
+        $oauthMock
+            ->expects($this->exactly(1))
+            ->method('getRequestEndpoint')
+            ->with($this->isInstanceOf(OauthTokenInterface::class))
+            ->willThrowException($clientException);
 
         $flashBagMock
             ->expects($this->exactly(1))
@@ -118,13 +130,14 @@ class OauthControllerTest extends TestCase
             ->willReturn(null);
 
         $container
-            ->expects($this->exactly(2))
+            ->expects($this->exactly(3))
             ->method('get')
             ->withConsecutive(
+                [Oauth::SERVICE_ID],
                 ['translator'],
                 ['session']
             )
-            ->willReturn($translatorMock, $sessionMock);
+            ->willReturn($oauthMock, $translatorMock, $sessionMock);
         $container
             ->expects($this->exactly(2))
             ->method('getParameter')
@@ -152,69 +165,6 @@ class OauthControllerTest extends TestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals('https://redirect_url', $response->getTargetUrl());
-    }
-
-    public function testConnectWithModelException()
-    {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
-
-        $translatorMock
-            ->expects($this->exactly(1))
-            ->method('trans')
-            ->with(
-                'jira.errors.model',
-                ['%parameters%' => '(token ID: 1, consumer key: consumer_key, URL: invalid_url)'], 'StingusJiraBundle'
-            )
-            ->willReturn('Error message');
-
-        $flashBagMock
-            ->expects($this->exactly(1))
-            ->method('add')
-            ->with('error', 'Error message');
-
-        $sessionMock
-            ->expects($this->exactly(1))
-            ->method('getFlashBag')
-            ->willReturn($flashBagMock);
-
-        $container
-            ->expects($this->exactly(1))
-            ->method('getParameter')
-            ->with('stingus_jira.oauth_token_class')
-            ->willReturn(OauthToken::class);
-        $container
-            ->expects($this->exactly(1))
-            ->method('has')
-            ->with('session')
-            ->willReturn(true);
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['translator'],
-                ['session']
-            )
-            ->willReturn($translatorMock, $sessionMock);
-
-        $controller = new OauthController();
-        $controller->setContainer($container);
-
-        $request = new Request([
-            'tokenId' => 1,
-            'consumerKey' => 'consumer_key',
-            'baseUrl' => 'invalid_url'],
-            [], [], [], [], ['HTTP_REFERER' => 'https://example.com/referer']
-        );
-
-        /** @noinspection PhpParamsInspection */
-        $response = $controller->connectAction($request);
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals('https://example.com/referer', $response->getTargetUrl());
     }
 
     public function testConnectWithClientException()
@@ -548,71 +498,6 @@ class OauthControllerTest extends TestCase
         $response = $controller->callbackAction($request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
-    }
-
-    public function testCallbackWithModelException()
-    {
-        $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
-        $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
-        $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
-
-        $translatorMock
-            ->expects($this->exactly(1))
-            ->method('trans')
-            ->with('jira.errors.model', ['%parameters%' => ''], 'StingusJiraBundle')
-            ->willReturn('Error message');
-
-        $flashBagMock
-            ->expects($this->exactly(1))
-            ->method('add')
-            ->with('error', 'Error message');
-
-        $sessionMock
-            ->expects($this->exactly(1))
-            ->method('getFlashBag')
-            ->willReturn($flashBagMock);
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('has')
-            ->withConsecutive(
-                ['stingus_jira.oauth_token_manager'],
-                ['session']
-            )
-            ->willReturn(false, true);
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('get')
-            ->withConsecutive(
-                ['translator'],
-                ['session']
-            )
-            ->willReturn($translatorMock, $sessionMock);
-
-        $container
-            ->expects($this->exactly(2))
-            ->method('getParameter')
-            ->withConsecutive(
-                ['stingus_jira.oauth_token_class'],
-                ['stingus_jira.redirect_url']
-            )
-            ->willReturn(OauthToken::class, 'https://redirect_url');
-
-        $controller = new OauthController();
-        $controller->setContainer($container);
-
-        $request = new Request([
-            'consumer_key' => '',
-            'base_url' => '',
-        ]);
-
-        /** @noinspection PhpParamsInspection */
-        $response = $controller->callbackAction($request);
-
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals('https://redirect_url', $response->getTargetUrl());
     }
 
     public function testCallbackWithClientException()

@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Stingus\JiraBundle\Tests\Model;
 
-use Stingus\JiraBundle\Exception\ModelException;
 use PHPUnit\Framework\TestCase;
 use Stingus\JiraBundle\Model\OauthTokenInterface;
 use Stingus\JiraBundle\Tests\Fixtures\OauthToken;
@@ -30,21 +29,6 @@ class OauthTokenTest extends TestCase
     }
 
     /**
-     * @param string $consumerKey
-     * @param string $exceptionMessage
-     *
-     * @dataProvider invalidConsumerKeyProvider
-     */
-    public function testInvalidConsumerKey($consumerKey, $exceptionMessage)
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage($exceptionMessage);
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setConsumerKey($consumerKey);
-    }
-
-    /**
      * @param mixed $baseUrl
      *
      * @dataProvider nonStringTypeProvider
@@ -52,21 +36,6 @@ class OauthTokenTest extends TestCase
     public function testInvalidBaseUrlType($baseUrl)
     {
         $this->expectException(\TypeError::class);
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setBaseUrl($baseUrl);
-    }
-
-    /**
-     * @param string $baseUrl
-     * @param string $exceptionMessage
-     *
-     * @dataProvider invalidBaseUrlProvider
-     */
-    public function testInvalidBaseUrl($baseUrl, $exceptionMessage)
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage($exceptionMessage);
 
         $oauthToken = new OauthToken();
         $oauthToken->setBaseUrl($baseUrl);
@@ -83,21 +52,6 @@ class OauthTokenTest extends TestCase
         $oauthToken->setId($id);
 
         $this->assertEquals($id, $oauthToken->getId());
-    }
-
-    /**
-     * @param mixed $id
-     * @param string $exceptionMessage
-     *
-     * @dataProvider invalidIdProvider
-     */
-    public function testInvalidId($id, $exceptionMessage)
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage($exceptionMessage);
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setId($id);
     }
 
     /**
@@ -126,15 +80,6 @@ class OauthTokenTest extends TestCase
         $oauthToken->setVerifier($verifier);
     }
 
-    public function testEmptyVerifier()
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage('Verifier must not be empty');
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setVerifier('');
-    }
-
     /**
      * @param string $token
      *
@@ -159,15 +104,6 @@ class OauthTokenTest extends TestCase
 
         $oauthToken = new OauthToken();
         $oauthToken->setToken($token);
-    }
-
-    public function testEmptyToken()
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage('Token must not be empty');
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setToken('');
     }
 
     /**
@@ -196,15 +132,6 @@ class OauthTokenTest extends TestCase
         $oauthToken->setTokenSecret($tokenSecret);
     }
 
-    public function testEmptyTokenSecret()
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage('Token secret must not be empty');
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setTokenSecret('');
-    }
-
     public function testValidExpiresAt()
     {
         $expiresAt = (new \DateTime())->add(new \DateInterval('PT1S'));
@@ -227,16 +154,6 @@ class OauthTokenTest extends TestCase
         $oauthToken->setExpiresAt($expiresAt);
     }
 
-    public function testExpiresAtInPast()
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage('Expire date must be in the future');
-
-        $expiresAt = (new \DateTime())->sub(new \DateInterval('PT0S'));
-        $oauthToken = new OauthToken();
-        $oauthToken->setExpiresAt($expiresAt);
-    }
-
     public function testValidAuthExpiresAt()
     {
         $authExpiresAt = (new \DateTime())->add(new \DateInterval('PT1S'));
@@ -255,16 +172,6 @@ class OauthTokenTest extends TestCase
     {
         $this->expectException(\TypeError::class);
 
-        $oauthToken = new OauthToken();
-        $oauthToken->setAuthExpiresAt($authExpiresAt);
-    }
-
-    public function testAuthExpiresAtInPast()
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage('Authorization expire date must be in the future');
-
-        $authExpiresAt = (new \DateTime())->sub(new \DateInterval('PT0S'));
         $oauthToken = new OauthToken();
         $oauthToken->setAuthExpiresAt($authExpiresAt);
     }
@@ -295,43 +202,6 @@ class OauthTokenTest extends TestCase
         $oauthToken->setSessionHandle($sessionHandle);
     }
 
-    public function testEmptySessionHandle()
-    {
-        $this->expectException(ModelException::class);
-        $this->expectExceptionMessage('Session handle must not be empty');
-
-        $oauthToken = new OauthToken();
-        $oauthToken->setSessionHandle('');
-    }
-
-    public function invalidConsumerKeyProvider()
-    {
-        return [
-            'Empty consumer key' => [
-                '',
-                'Consumer key length must be between 0 and 255 characters',
-            ],
-            'Consumer key too long' => [
-                str_repeat('a', 256),
-                'Consumer key length must be between 0 and 255 characters',
-            ],
-        ];
-    }
-
-    public function invalidBaseUrlProvider()
-    {
-        return [
-            'Invalid base URL 1' => [
-                'example',
-                'Base URL is invalid',
-            ],
-            'Invalid base URL 2' => [
-                'example.com',
-                'Base URL is invalid',
-            ],
-        ];
-    }
-
     public function validIdProvider()
     {
         return [
@@ -342,36 +212,6 @@ class OauthTokenTest extends TestCase
             ['a-b-c'],
             ['ABC'],
             [str_repeat('a_-.', 20)],
-        ];
-    }
-
-    public function invalidIdProvider()
-    {
-        return [
-            'Zero Id' => [
-                0,
-                'An integer ID must be greater than 0'
-            ],
-            'Negative Id' => [
-                -1,
-                'An integer ID must be greater than 0'
-            ],
-            'Float Id' => [
-                .1,
-                'The ID must be a string or a positive integer'
-            ],
-            'Array Id' => [
-                [],
-                'The ID must be a string or a positive integer'
-            ],
-            'Object Id' => [
-                new \stdClass(),
-                'The ID must be a string or a positive integer'
-            ],
-            'Empty string Id' => [
-                '',
-                'A string ID must not be empty'
-            ],
         ];
     }
 

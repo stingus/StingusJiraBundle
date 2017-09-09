@@ -3,7 +3,6 @@
 namespace Stingus\JiraBundle\Controller;
 
 use GuzzleHttp\Exception\ClientException;
-use Stingus\JiraBundle\Exception\ModelException;
 use Stingus\JiraBundle\Model\OauthTokenInterface;
 use Stingus\JiraBundle\Oauth\Oauth;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -46,15 +45,6 @@ class OauthController extends Controller
                 $oauthToken->setId($tokenId);
             }
             $redirectUrl = $this->get(Oauth::SERVICE_ID)->getRequestEndpoint($oauthToken);
-        } catch (ModelException $exception) {
-            $this->addFlash(
-                'error',
-                $this->get('translator')->trans(
-                    'jira.errors.model',
-                    ['%parameters%' => sprintf('(token ID: %s, consumer key: %s, URL: %s)', $tokenId, $consumerKey, $baseUrl)],
-                    'StingusJiraBundle'
-                )
-            );
         } catch (ClientException $exception) {
             if (Response::HTTP_UNAUTHORIZED === $exception->getCode()) {
                 $this->addFlash(
@@ -107,15 +97,6 @@ class OauthController extends Controller
                 ->setToken($request->query->get('oauth_token'))
                 ->setVerifier($request->query->get('oauth_verifier'));
             $this->get(Oauth::SERVICE_ID)->getAccessToken($oauthToken);
-        } catch (ModelException $exception) {
-            $this->addFlash(
-                'error',
-                $this->get('translator')->trans(
-                    'jira.errors.model',
-                    ['%parameters%' => ''],
-                    'StingusJiraBundle'
-                )
-            );
         } catch (ClientException $exception) {
             if (Response::HTTP_UNAUTHORIZED === $exception->getCode()) {
                 $this->addFlash(

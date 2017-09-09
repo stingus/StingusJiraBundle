@@ -1,7 +1,6 @@
 jira:
   errors:
     general: 'There was a problem connecting to your Jira instance'
-    model: 'Supplied connection parameters are invalid %parameters%'
     unauthorized: 'There was an error connecting to your Jira instance. Please check if you configured your Jira instance to accept connections with the consumer key: %consumerKey%'
     denied: 'You denied the authorization of Scrumvee on your Jira instance'
     token_id_missing: "Token ID must be set if you're using model mapping"

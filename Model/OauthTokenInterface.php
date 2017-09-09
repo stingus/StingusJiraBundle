@@ -2,8 +2,6 @@
 
 namespace Stingus\JiraBundle\Model;
 
-use Stingus\JiraBundle\Exception\ModelException;
-
 /**
  * Interface OauthTokenInterface
  *
@@ -36,7 +34,6 @@ interface OauthTokenInterface
      * @param string $consumerKey
      *
      * @return AbstractOauthToken
-     * @throws ModelException
      */
     public function setConsumerKey(string $consumerKey): AbstractOauthToken;
 
@@ -51,7 +48,6 @@ interface OauthTokenInterface
      * @param string $baseUrl
      *
      * @return AbstractOauthToken
-     * @throws ModelException
      */
     public function setBaseUrl(string $baseUrl): AbstractOauthToken;
 
