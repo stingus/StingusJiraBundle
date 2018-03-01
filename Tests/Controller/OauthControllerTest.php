@@ -83,7 +83,7 @@ class OauthControllerTest extends TestCase
         $queryMock = $this->getMockBuilder(ParameterBagInterface::class)->getMock();
         $headersMock = $this->getMockBuilder(ParameterBagInterface::class)->getMock();
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
 
@@ -172,7 +172,7 @@ class OauthControllerTest extends TestCase
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $requestMock = $this->getMockBuilder(RequestInterface::class)->getMock();
 
@@ -241,7 +241,7 @@ class OauthControllerTest extends TestCase
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $requestMock = $this->getMockBuilder(RequestInterface::class)->getMock();
         $responseMock = $this->getMockBuilder(ResponseInterface::class)->getMock();
@@ -505,7 +505,7 @@ class OauthControllerTest extends TestCase
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $requestMock = $this->getMockBuilder(RequestInterface::class)->getMock();
 
@@ -584,7 +584,7 @@ class OauthControllerTest extends TestCase
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $oauthMock = $this->getMockBuilder(Oauth::class)->disableOriginalConstructor()->getMock();
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $requestMock = $this->getMockBuilder(RequestInterface::class)->getMock();
         $responseMock = $this->getMockBuilder(ResponseInterface::class)->getMock();
@@ -668,7 +668,7 @@ class OauthControllerTest extends TestCase
     {
         $container = $this->getMockBuilder(ContainerInterface::class)->getMock();
         $flashBagMock = $this->getMockBuilder(FlashBagInterface::class)->getMock();
-        $sessionMock = $this->getMockBuilder(Session::class)->getMock();
+        $sessionMock = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $translatorMock = $this->getMockBuilder(TranslatorInterface::class)->getMock();
         $tokenManagerMock = $this
             ->getMockBuilder(OauthTokenManager::class)
