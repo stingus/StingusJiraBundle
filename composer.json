@@ -21,7 +21,7 @@
   "require-dev": {
     "symfony/translation": "^3.3",
     "symfony/yaml": "^3.3",
-    "doctrine/doctrine-bundle": "^1.6",
+    "doctrine/doctrine-bundle": "^1.9",
     "doctrine/orm": "^2.5",
     "phpunit/phpunit": "^6.2",
     "codeclimate/php-test-reporter": "^0"

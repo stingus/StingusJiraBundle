@@ -1,6 +1,6 @@
 services:
   stingus_jira.object_manager:
-    factory: Doctrine\Common\Persistence\ManagerRegistry:getManager
+    factory: Symfony\Bridge\Doctrine\RegistryInterface:getEntityManager
     class: Doctrine\Common\Persistence\ObjectManager
     public: false
     arguments: ['%stingus_jira.model_manager_name%']
