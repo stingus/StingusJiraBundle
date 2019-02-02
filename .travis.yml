@@ -1,16 +1,15 @@
 env:
   global:
-    - CC_TEST_REPORTER_ID=547ac8b429d3b49697b24f7b604bd980074d8b34c35804c5b5d715f04724e67f
-    - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
+    - CC_TEST_REPORTER_ID: 547ac8b429d3b49697b24f7b604bd980074d8b34c35804c5b5d715f04724e67f
+    - GIT_COMMITTED_AT: $(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
 
 language: php
-
-dist: trusty
 
 php:
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 sudo: false
 
@@ -26,4 +25,6 @@ before_script:
 
 script:
   - ./vendor/bin/phpunit
-  - if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
+
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

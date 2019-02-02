@@ -124,8 +124,11 @@ class GenerateCertCommand extends ContainerAwareCommand
         ];
 
         $validityDays = $helper->ask($input, $output, $validityDaysQuestion);
-
-        $privateKey = openssl_pkey_new();
+        $privateKey = openssl_pkey_new([
+            'digest_alg' => 'sha256',
+            'private_key_bits' => 2048,
+            'private_key_type' => OPENSSL_KEYTYPE_RSA,
+        ]);
         $csr = openssl_csr_new($dn, $privateKey);
         $cert = openssl_csr_sign($csr, null, $privateKey, $validityDays);
         $public = openssl_pkey_get_public($cert);

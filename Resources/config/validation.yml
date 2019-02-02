@@ -12,4 +12,4 @@ ScrumBundle\Entity\JiraToken:
       - NotBlank:
           message: jira_token.base_url.not_blank
       - Url:
-          checkDNS: true
+          checkDNS: 'ANY'
