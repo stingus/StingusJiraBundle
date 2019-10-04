@@ -12,4 +12,4 @@ services:
   stingus_jira.oauth_client:
     public: false
     class: Stingus\JiraBundle\Oauth\OauthClient
-    arguments: ['%kernel.project_dir%', '%stingus_jira.cert_path%']
+    arguments: ['%kernel.project_dir%', '%stingus_jira.cert_path%', '%stingus_jira.timeout%']

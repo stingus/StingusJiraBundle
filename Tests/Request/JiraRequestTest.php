@@ -108,7 +108,7 @@ class JiraRequestTest extends TestCase
 
         $oauthClientMock = $this->getMockBuilder(OauthClient::class)->disableOriginalConstructor()->getMock();
         $oauthClientMock
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('getClient')
             ->with($oauthToken)
             ->willReturn($client);

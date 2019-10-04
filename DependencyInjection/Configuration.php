@@ -45,6 +45,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('redirect_url')
                     ->isRequired()
                 ->end()
+                ->scalarNode('timeout')
+                    ->defaultValue(5)
+                ->end()
             ->end();
 
         return $treeBuilder;

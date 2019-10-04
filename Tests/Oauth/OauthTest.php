@@ -75,7 +75,7 @@ class OauthTest extends TestCase
 
         $tokenManager = $this->getMockBuilder(OauthTokenManager::class)->disableOriginalConstructor()->getMock();
         $tokenManager
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('save')
             ->with($oauthToken);
 
@@ -169,7 +169,7 @@ class OauthTest extends TestCase
     {
         $routerMock = $this->getMockBuilder(Router::class)->disableOriginalConstructor()->getMock();
         $routerMock
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('generate')
             ->with(
                 'stingus_jira_callback',
@@ -186,7 +186,7 @@ class OauthTest extends TestCase
 
         $oauthClientMock = $this->getMockBuilder(OauthClient::class)->disableOriginalConstructor()->getMock();
         $oauthClientMock
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('getClient')
             ->with($oauthToken)
             ->willReturn($client);
@@ -206,7 +206,7 @@ class OauthTest extends TestCase
 
         $oauthClientMock = $this->getMockBuilder(OauthClient::class)->disableOriginalConstructor()->getMock();
         $oauthClientMock
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('getClient')
             ->with($oauthToken)
             ->willReturn($client);
@@ -214,11 +214,11 @@ class OauthTest extends TestCase
         $jiraRequest = new JiraRequest($oauthClientMock);
         $dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcher
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('dispatch')
             ->with(
                 StingusJiraEvents::OAUTH_TOKEN_GENERATE,
-                $this->callback(function (OauthTokenGeneratedEvent $event) {
+                $this->callback(static function (OauthTokenGeneratedEvent $event) {
                     return $event->getOauthToken() instanceof OauthTokenInterface;
                 }));
 
@@ -234,7 +234,7 @@ class OauthTest extends TestCase
 
         $oauthClientMock = $this->getMockBuilder(OauthClient::class)->disableOriginalConstructor()->getMock();
         $oauthClientMock
-            ->expects($this->exactly(1))
+            ->expects($this->once())
             ->method('getClient')
             ->with($oauthToken)
             ->willReturn($client);

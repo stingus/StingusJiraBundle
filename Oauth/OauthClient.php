@@ -10,8 +10,6 @@ use Stingus\JiraBundle\Model\OauthTokenInterface;
 /**
  * Class OauthClient.
  * OAuth middleware for Guzzle 6
- *
- * @package Stingus\JiraBundle\Oauth
  */
 class OauthClient
 {
@@ -23,16 +21,21 @@ class OauthClient
     /** @var string Certificates path */
     private $certPath;
 
+    /** @var int */
+    private $timeout;
+
     /**
      * OauthClient constructor.
      *
      * @param string $projectRoot
      * @param string $certPath
+     * @param int    $timeout
      */
-    public function __construct(string $projectRoot, string $certPath)
+    public function __construct(string $projectRoot, string $certPath, int $timeout)
     {
         $this->projectRoot = $projectRoot;
         $this->certPath = $certPath;
+        $this->timeout = $timeout;
     }
 
     /**
@@ -61,6 +64,7 @@ class OauthClient
                 'base_uri' => $oauthToken->getBaseUrl(),
                 'handler'  => $stack,
                 'auth'     => 'oauth',
+                'timeout'  => $this->timeout,
             ]
         );
     }

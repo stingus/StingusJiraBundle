@@ -16,6 +16,7 @@ class StingusJiraExtension extends Extension
 {
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -38,5 +39,6 @@ class StingusJiraExtension extends Extension
         $container->setParameter('stingus_jira.oauth_token_class', $config['oauth_token_class']);
         $container->setParameter('stingus_jira.cert_path', $config['cert_path']);
         $container->setParameter('stingus_jira.redirect_url', $config['redirect_url']);
+        $container->setParameter('stingus_jira.timeout', $config['timeout']);
     }
 }
