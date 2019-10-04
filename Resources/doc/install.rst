@@ -103,6 +103,7 @@ Here's the full config section:
       oauth_token_class: AppBundle\Entity\JiraToken
       cert_path: var/certs
       redirect_url: http://example.com/redirect
+      timeout: 5
 
 Mapping
 ~~~~~~~
