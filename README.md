@@ -25,7 +25,7 @@ Stingus/Jira/Event/OauthTokenGeneratedEvent
 
 ## Prerequisites
 - PHP >= 7.0 (openssl extension required)
-- Symfony >= 3.3
+- Symfony >= 3.4
 
 ## Documentation
 See the [bundle documentation](https://github.com/stingus/StingusJiraBundle/blob/master/Resources/doc/index.rst)
