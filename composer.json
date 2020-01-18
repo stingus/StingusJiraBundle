@@ -12,16 +12,16 @@
     }
   ],
   "require": {
-    "php": "^7.0",
+    "php": "^7.1",
     "ext-openssl": "*",
     "ext-json": "*",
-    "symfony/framework-bundle": "^3.4",
+    "symfony/framework-bundle": "^3.4 | ^4.3",
     "guzzlehttp/guzzle": "^6.2",
     "guzzlehttp/oauth-subscriber": "^0"
   },
   "require-dev": {
-    "symfony/translation": "^3.4",
-    "symfony/yaml": "^3.4",
+    "symfony/translation": "^3.4 | ^4.3",
+    "symfony/yaml": "^3.4 | ^4.3",
     "doctrine/doctrine-bundle": "^1.9",
     "doctrine/orm": "^2.5",
     "phpunit/phpunit": "^6.2",
